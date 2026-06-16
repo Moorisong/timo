@@ -175,25 +175,32 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>사진 미리보기</Text>
             <View style={styles.previewCard}>
               <View style={styles.previewOverlay}>
-                <Text style={styles.previewAgency}>
-                  {settings.agencyName}
-                </Text>
-                {!!settings.inspectorName && (
-                  <Text style={styles.previewText}>
-                    {settings.inspectorName}
+                {(!!settings.agencyName || !!settings.inspectorName) && (
+                  <Text style={styles.previewAgency} numberOfLines={1}>
+                    {[settings.agencyName, settings.inspectorName].filter(Boolean).join(' / ')}
                   </Text>
                 )}
                 {!!settings.comment && (
-                  <Text style={styles.previewText}>
+                  <Text style={styles.previewText} numberOfLines={1}>
                     {settings.comment}
                   </Text>
                 )}
               </View>
-              <View style={styles.previewWatermark}>
+              {/* 워터마크 미리보기 (좌측) */}
+              <View style={styles.previewWatermarkLeft}>
                 <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
-                <Text style={styles.watermarkTime}>
-                  {formatTimestamp(new Date())}
-                </Text>
+              </View>
+              {/* 날짜 미리보기 (우측) */}
+              <View style={styles.previewWatermarkRight}>
+                {(() => {
+                  const [datePart, timePart] = formatTimestamp(new Date()).split('\n');
+                  return (
+                    <View style={styles.timeBadge}>
+                      <Text style={styles.dateText}>{datePart}</Text>
+                      <Text style={styles.timeText}>{timePart}</Text>
+                    </View>
+                  );
+                })()}
               </View>
             </View>
           </View>
