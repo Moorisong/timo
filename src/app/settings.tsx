@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, Switch } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
@@ -31,6 +31,7 @@ import { styles } from './settings.styles';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { settings, isLoaded, updateField, saveSettings } = useSettings();
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -67,7 +68,7 @@ export default function SettingsScreen() {
       </SafeAreaView>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 40 + insets.bottom }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.sectionHeader}>
