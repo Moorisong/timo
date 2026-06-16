@@ -8,7 +8,6 @@ import {
   View,
   Text,
   Pressable,
-  Alert,
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
@@ -36,6 +35,16 @@ export default function PreviewScreen() {
   const viewShotRef = useRef<ViewShot>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setToastVisible(true);
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 300);
+  }, []);
 
   const captureData: CaptureData | null = params.captureData
     ? JSON.parse(params.captureData)
@@ -67,23 +76,24 @@ export default function PreviewScreen() {
     try {
       const composedUri = await captureComposedImage();
       if (!composedUri) {
-        Alert.alert('오류', '이미지 합성에 실패했습니다.');
+        showToast('이미지 합성에 실패했습니다.');
         return;
       }
       const success = await saveImageToGallery(composedUri);
       if (success) {
-        Alert.alert('저장 완료', '갤러리에 저장되었습니다.', [
-          { text: '확인', onPress: () => router.back() },
-        ]);
+        showToast('갤러리에 저장되었습니다.');
+        setTimeout(() => {
+          router.back();
+        }, 300);
       } else {
-        Alert.alert('저장 실패', '사진 저장 권한을 확인해주세요.');
+        showToast('사진 저장 권한을 확인해주세요.');
       }
     } catch {
-      Alert.alert('오류', '저장 중 오류가 발생했습니다.');
+      showToast('저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, captureComposedImage, router]);
+  }, [isSaving, captureComposedImage, router, showToast]);
 
   const handleShare = useCallback(async () => {
     if (isSharing) return;
@@ -91,21 +101,21 @@ export default function PreviewScreen() {
     try {
       const composedUri = await captureComposedImage();
       if (!composedUri) {
-        Alert.alert('오류', '이미지 합성에 실패했습니다.');
+        showToast('이미지 합성에 실패했습니다.');
         return;
       }
       const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
         await Sharing.shareAsync(composedUri, { mimeType: 'image/jpeg' });
       } else {
-        Alert.alert('오류', '공유 기능을 사용할 수 없습니다.');
+        showToast('공유 기능을 사용할 수 없습니다.');
       }
     } catch {
-      Alert.alert('오류', '공유 중 오류가 발생했습니다.');
+      showToast('공유 중 오류가 발생했습니다.');
     } finally {
       setIsSharing(false);
     }
-  }, [isSharing, captureComposedImage]);
+  }, [isSharing, captureComposedImage, showToast]);
 
   const isLandscape = captureData ? captureData.width > captureData.height : false;
   const composerWidth = SCREEN_WIDTH;
@@ -216,6 +226,12 @@ export default function PreviewScreen() {
           <Text style={styles.saveActionText}>저장</Text>
         </Pressable>
       </SafeAreaView>
+
+      {toastVisible && (
+        <View style={styles.toastContainer}>
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </View>
+      )}
     </View>
   );
 }
