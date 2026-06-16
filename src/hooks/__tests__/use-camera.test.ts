@@ -50,10 +50,10 @@ describe('useCamera Hook 테스트', () => {
       photoResult = await result.current.takePicture();
     });
 
-    // 1. skipProcessing: true와 quality가 올바르게 전달되었는지 확인
+    // 1. exif: true와 quality가 올바르게 전달되었는지 확인
     expect(mockTakePictureAsync).toHaveBeenCalledWith({
       quality: 0.9,
-      skipProcessing: true,
+      exif: true,
     });
 
     // 2. 반환 타입에 width, height가 제대로 포함되었는지 확인

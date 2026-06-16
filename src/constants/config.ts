@@ -32,4 +32,5 @@ export const DEFAULT_SETTINGS = {
   inspectorName: '',
   comment: '',
   locationEnabled: true,
+  metadataBackgroundEnabled: true,
 } as const;

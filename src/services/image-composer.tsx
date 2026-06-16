@@ -93,14 +93,37 @@ export default function ComposerOverlay({
                   paddingHorizontal: 12 * scale,
                   paddingVertical: 6 * scale,
                   borderRadius: 8 * scale,
-                  borderWidth: 1 * scale,
+                  borderWidth: settings.metadataBackgroundEnabled ? 1 * scale : 0,
+                  backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.25)' : 'transparent',
                 },
               ]}
             >
-              <Text style={[styles.dateText, { fontSize: 10 * scale, letterSpacing: 0.5 * scale }]}>
+              <Text
+                style={[
+                  styles.dateText,
+                  {
+                    fontSize: 10 * scale,
+                    letterSpacing: 0.5 * scale,
+                    textShadowColor: 'rgba(0,0,0,0.7)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 3,
+                  },
+                ]}
+              >
                 {datePart}
               </Text>
-              <Text style={[styles.timeText, { fontSize: 15 * scale, marginTop: 1 * scale }]}>
+              <Text
+                style={[
+                  styles.timeText,
+                  {
+                    fontSize: 15 * scale,
+                    marginTop: 1 * scale,
+                    textShadowColor: 'rgba(0,0,0,0.7)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 3,
+                  },
+                ]}
+              >
                 {timePart}
               </Text>
             </View>
@@ -111,7 +134,15 @@ export default function ComposerOverlay({
       {/* 하단: 메타데이터 오버레이 */}
       {showOverlay && (
         <View style={styles.metadataContainer}>
-          <View style={[styles.metadataBg, { padding: 12 * scale }]}>
+          <View
+            style={[
+              styles.metadataBg,
+              {
+                padding: 12 * scale,
+                backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.35)' : 'transparent',
+              },
+            ]}
+          >
             {metadataList.map((item, idx) => {
               const isFirst = idx === 0;
               const isLocation = location?.address === item;
@@ -133,7 +164,16 @@ export default function ComposerOverlay({
               return (
                 <Text
                   key={idx}
-                  style={[textStyle, { fontSize: fontSizeVal, marginBottom: marginBottomVal }]}
+                  style={[
+                    textStyle,
+                    {
+                      fontSize: fontSizeVal,
+                      marginBottom: marginBottomVal,
+                      textShadowColor: 'rgba(0,0,0,0.7)',
+                      textShadowOffset: { width: 0, height: 1 },
+                      textShadowRadius: 3,
+                    },
+                  ]}
                   numberOfLines={1}
                 >
                   {item}

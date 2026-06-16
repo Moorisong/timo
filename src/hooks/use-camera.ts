@@ -45,7 +45,7 @@ export default function useCamera(): UseCameraReturn {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync({
         quality: CAMERA_QUALITY,
-        skipProcessing: true,
+        exif: true,
       });
       if (photo?.uri) {
         return {

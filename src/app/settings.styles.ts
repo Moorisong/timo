@@ -139,7 +139,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 12,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   previewAgency: {
     color: 'rgba(255,255,255,0.9)',
@@ -162,13 +162,16 @@ export const styles = StyleSheet.create({
     right: 10,
   },
   timeBadge: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'flex-end',
+  },
+  previewImage: {
+    ...StyleSheet.absoluteFillObject,
   },
   watermarkTitle: {
     color: 'rgba(255,255,255,0.85)',
@@ -224,5 +227,22 @@ export const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 15,
     fontWeight: '600',
+  },
+  switchGroup: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  switchLabel: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  previewOverlayNoBg: {
+    backgroundColor: 'transparent',
   },
 });

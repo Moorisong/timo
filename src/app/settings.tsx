@@ -4,8 +4,9 @@
  */
 
 import React from 'react';
-import { View, Text, Pressable, TextInput, ScrollView } from 'react-native';
+import { View, Text, Pressable, TextInput, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
@@ -210,6 +211,27 @@ export default function SettingsScreen() {
           입력된 항목은 촬영 사진에 자동으로 표시됩니다.
         </Text>
 
+        <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+          <FileText size={14} color={COLORS.textSecondary} />
+          <Text style={styles.sectionTitle}>오버레이 디자인</Text>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.switchGroup}>
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>배경 박스 표시</Text>
+              <Switch
+                value={settings.metadataBackgroundEnabled}
+                onValueChange={(val) => updateField('metadataBackgroundEnabled', val)}
+                trackColor={{ false: '#333', true: COLORS.primary }}
+                thumbColor={settings.metadataBackgroundEnabled ? '#FFF' : '#AAA'}
+                accessible={true}
+                accessibilityLabel="배경 박스 표시 설정 토글"
+              />
+            </View>
+          </View>
+        </View>
+
         {/* Preview */}
         {(settings.agencyName ||
           settings.inspectorName ||
@@ -217,14 +239,44 @@ export default function SettingsScreen() {
           <View style={styles.previewSection}>
             <Text style={styles.sectionTitle}>사진 미리보기</Text>
             <View style={styles.previewCard}>
-              <View style={styles.previewOverlay}>
+              <Image
+                source={require('@/../assets/images/preview_placeholder.png')}
+                style={styles.previewImage}
+                contentFit="cover"
+              />
+              <View
+                style={[
+                  styles.previewOverlay,
+                  !settings.metadataBackgroundEnabled && styles.previewOverlayNoBg,
+                ]}
+              >
                 {(!!settings.agencyName || !!settings.inspectorName) && (
-                  <Text style={styles.previewAgency} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.previewAgency,
+                      !settings.metadataBackgroundEnabled && {
+                        textShadowColor: 'rgba(0,0,0,0.7)',
+                        textShadowOffset: { width: 0, height: 1 },
+                        textShadowRadius: 3,
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
                     {[settings.agencyName, settings.inspectorName].filter(Boolean).join(' / ')}
                   </Text>
                 )}
                 {!!settings.comment && (
-                  <Text style={styles.previewText} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.previewText,
+                      !settings.metadataBackgroundEnabled && {
+                        textShadowColor: 'rgba(0,0,0,0.7)',
+                        textShadowOffset: { width: 0, height: 1 },
+                        textShadowRadius: 3,
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
                     {settings.comment}
                   </Text>
                 )}
@@ -238,9 +290,39 @@ export default function SettingsScreen() {
                 {(() => {
                   const [datePart, timePart] = formatTimestamp(new Date()).split('\n');
                   return (
-                    <View style={styles.timeBadge}>
-                      <Text style={styles.dateText}>{datePart}</Text>
-                      <Text style={styles.timeText}>{timePart}</Text>
+                    <View
+                      style={[
+                        styles.timeBadge,
+                        !settings.metadataBackgroundEnabled && {
+                          backgroundColor: 'transparent',
+                          borderColor: 'transparent',
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.dateText,
+                          !settings.metadataBackgroundEnabled && {
+                            textShadowColor: 'rgba(0,0,0,0.7)',
+                            textShadowOffset: { width: 0, height: 1 },
+                            textShadowRadius: 3,
+                          },
+                        ]}
+                      >
+                        {datePart}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.timeText,
+                          !settings.metadataBackgroundEnabled && {
+                            textShadowColor: 'rgba(0,0,0,0.7)',
+                            textShadowOffset: { width: 0, height: 1 },
+                            textShadowRadius: 3,
+                          },
+                        ]}
+                      >
+                        {timePart}
+                      </Text>
                     </View>
                   );
                 })()}

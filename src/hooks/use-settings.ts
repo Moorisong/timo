@@ -12,6 +12,7 @@ import {
   STORAGE_KEY_INSPECTOR_NAME,
   STORAGE_KEY_COMMENT,
   STORAGE_KEY_LOCATION_ENABLED,
+  STORAGE_KEY_METADATA_BACKGROUND_ENABLED,
   DEFAULT_SETTINGS,
 } from '@/constants';
 
@@ -33,6 +34,7 @@ const STORAGE_MAP: Record<keyof Settings, string> = {
   inspectorName: STORAGE_KEY_INSPECTOR_NAME,
   comment: STORAGE_KEY_COMMENT,
   locationEnabled: STORAGE_KEY_LOCATION_ENABLED,
+  metadataBackgroundEnabled: STORAGE_KEY_METADATA_BACKGROUND_ENABLED,
 };
 
 export default function useSettings(): UseSettingsReturn {
@@ -58,6 +60,8 @@ export default function useSettings(): UseSettingsReturn {
           loaded.comment = value;
         } else if (key === STORAGE_KEY_LOCATION_ENABLED) {
           loaded.locationEnabled = value === 'true';
+        } else if (key === STORAGE_KEY_METADATA_BACKGROUND_ENABLED) {
+          loaded.metadataBackgroundEnabled = value === 'true';
         }
       }
 
@@ -85,6 +89,7 @@ export default function useSettings(): UseSettingsReturn {
         [STORAGE_KEY_INSPECTOR_NAME, settings.inspectorName],
         [STORAGE_KEY_COMMENT, settings.comment],
         [STORAGE_KEY_LOCATION_ENABLED, String(settings.locationEnabled)],
+        [STORAGE_KEY_METADATA_BACKGROUND_ENABLED, String(settings.metadataBackgroundEnabled)],
       ];
 
       await AsyncStorage.multiSet(pairs);

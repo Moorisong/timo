@@ -8,6 +8,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     ['timo_inspector_name', 'Test Inspector'],
     ['timo_comment', 'Test Comment'],
     ['timo_location_enabled', 'true'],
+    ['timo_metadata_background_enabled', 'true'],
   ]),
   multiSet: jest.fn().mockResolvedValue(null),
 }));
@@ -31,6 +32,7 @@ describe('useSettings Hook 테스트', () => {
       inspectorName: 'Test Inspector',
       comment: 'Test Comment',
       locationEnabled: true,
+      metadataBackgroundEnabled: true,
     });
   });
 
@@ -70,6 +72,7 @@ describe('useSettings Hook 테스트', () => {
       ['timo_inspector_name', 'Test Inspector'],
       ['timo_comment', 'Test Comment'],
       ['timo_location_enabled', 'true'],
+      ['timo_metadata_background_enabled', 'true'],
     ]);
   });
 
@@ -104,6 +107,7 @@ describe('useSettings Hook 테스트', () => {
       ['timo_inspector_name', 'Test Inspector'],
       ['timo_comment', 'Updated Inspection Memo'],
       ['timo_location_enabled', 'true'],
+      ['timo_metadata_background_enabled', 'true'],
     ]);
 
     await act(async () => {

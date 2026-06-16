@@ -11,6 +11,7 @@ export interface Settings {
   inspectorName: string;
   comment: string;
   locationEnabled: boolean;
+  metadataBackgroundEnabled: boolean;
 }
 
 /** 위치 데이터 */
