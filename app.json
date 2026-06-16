@@ -8,7 +8,7 @@
     "scheme": "timo",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "infoPlist": {
         "NSCameraUsageDescription": "현장 사진 촬영을 위해 카메라 접근이 필요합니다.",
         "NSLocationWhenInUseUsageDescription": "촬영 사진에 위치 정보를 기록하기 위해 위치 접근이 필요합니다.",

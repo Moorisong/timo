@@ -1,6 +1,20 @@
 import { Stack } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* Prevent unhandled promise rejection in environments without splash screen support */
+});
 
 export default function Layout() {
+  useEffect(() => {
+    // Hide the splash screen once the initial layout has mounted
+    SplashScreen.hideAsync().catch(() => {
+      /* Prevent unhandled promise rejection */
+    });
+  }, []);
+
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
       <Stack.Screen name="index" options={{ animation: 'fade' }} />
