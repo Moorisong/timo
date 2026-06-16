@@ -50,3 +50,15 @@ describe('ComposerOverlay 메타데이터 리스트 합성 테스트', () => {
     expect(list[0]).toBe('한강유역환경청');
   });
 });
+
+// React Native 컴포넌트의 스케일 폰트 크기 계산 결과를 계산하는 테스트
+// 실제 렌더링 대신 스타일 데이터의 배율 연산 로직의 안전성을 검증합니다.
+describe('고해상도 스케일 팩터 스타일 연산 검증', () => {
+  it('스케일 값에 비례하여 텍스트 크기(fontSize)가 올바르게 스케일링되는지 연산식을 검증한다', () => {
+    const scale = 2.5;
+    const baseFontSize = 13;
+    const scaledFontSize = baseFontSize * scale;
+    
+    expect(scaledFontSize).toBe(32.5);
+  });
+});

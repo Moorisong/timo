@@ -18,6 +18,7 @@ interface ComposerOverlayProps {
   location: LocationData | null;
   imageWidth: number;
   imageHeight: number;
+  scale?: number;
 }
 
 /**
@@ -59,6 +60,7 @@ export default function ComposerOverlay({
   location,
   imageWidth,
   imageHeight,
+  scale = 1,
 }: ComposerOverlayProps) {
   const metadataList = composeMetadataList(settings, location);
   const showOverlay = metadataList.length > 0;
@@ -73,18 +75,34 @@ export default function ComposerOverlay({
       />
 
       {/* 상단 워터마크 (좌측) */}
-      <View style={styles.watermarkContainerLeft}>
-        <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
+      <View style={[styles.watermarkContainerLeft, { top: 10 * scale, left: 12 * scale }]}>
+        <Text style={[styles.watermarkTitle, { fontSize: 15 * scale, letterSpacing: 1.5 * scale }]}>
+          {WATERMARK_TEXT}
+        </Text>
       </View>
 
       {/* 상단 날짜 (우측) */}
-      <View style={styles.watermarkContainerRight}>
+      <View style={[styles.watermarkContainerRight, { top: 10 * scale, right: 12 * scale }]}>
         {(() => {
           const [datePart, timePart] = timestamp.split('\n');
           return (
-            <View style={styles.timeBadge}>
-              <Text style={styles.dateText}>{datePart}</Text>
-              <Text style={styles.timeText}>{timePart}</Text>
+            <View
+              style={[
+                styles.timeBadge,
+                {
+                  paddingHorizontal: 12 * scale,
+                  paddingVertical: 6 * scale,
+                  borderRadius: 8 * scale,
+                  borderWidth: 1 * scale,
+                },
+              ]}
+            >
+              <Text style={[styles.dateText, { fontSize: 10 * scale, letterSpacing: 0.5 * scale }]}>
+                {datePart}
+              </Text>
+              <Text style={[styles.timeText, { fontSize: 15 * scale, marginTop: 1 * scale }]}>
+                {timePart}
+              </Text>
             </View>
           );
         })()}
@@ -93,20 +111,31 @@ export default function ComposerOverlay({
       {/* 하단: 메타데이터 오버레이 */}
       {showOverlay && (
         <View style={styles.metadataContainer}>
-          <View style={styles.metadataBg}>
+          <View style={[styles.metadataBg, { padding: 12 * scale }]}>
             {metadataList.map((item, idx) => {
               const isFirst = idx === 0;
               const isLocation = location?.address === item;
 
               let textStyle = styles.metadataText;
+              let fontSizeVal = 11 * scale;
+              let marginBottomVal = 0;
+
               if (isFirst) {
                 textStyle = styles.metadataAgency;
+                fontSizeVal = 13 * scale;
+                marginBottomVal = 2 * scale;
               } else if (isLocation) {
                 textStyle = styles.metadataLocation;
+                fontSizeVal = 12 * scale;
+                marginBottomVal = 2 * scale;
               }
 
               return (
-                <Text key={idx} style={textStyle} numberOfLines={1}>
+                <Text
+                  key={idx}
+                  style={[textStyle, { fontSize: fontSizeVal, marginBottom: marginBottomVal }]}
+                  numberOfLines={1}
+                >
                   {item}
                 </Text>
               );

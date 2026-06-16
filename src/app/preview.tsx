@@ -118,18 +118,35 @@ export default function PreviewScreen() {
   }, [isSharing, captureComposedImage, showToast]);
 
   const isLandscape = captureData ? captureData.width > captureData.height : false;
+  
+  // 1. 화면에 보일 레이아웃 크기 설정 (화면 너비 기준)
   const composerWidth = SCREEN_WIDTH;
   const composerHeight = isLandscape
     ? composerWidth * (3 / 4)
     : composerWidth * (4 / 3);
+
+  // 2. 저장용 고해상도 캡처 규격 설정 (1920px 수준의 초고화질)
+  const TARGET_CAPTURE_WIDTH = 1920;
+  const captureWidth = TARGET_CAPTURE_WIDTH;
+  const captureHeight = isLandscape
+    ? captureWidth * (3 / 4)
+    : captureWidth * (4 / 3);
+
+  // 화면에는 1:1 원래 배율로 렌더링됩니다.
+  const scale = 1;
 
   return (
     <View style={styles.container}>
       <View style={styles.composerWrapper}>
         <ViewShot
           ref={viewShotRef}
-          options={{ format: 'jpg', quality: 0.95 }}
-          style={styles.viewShot}
+          options={{
+            format: 'jpg',
+            quality: 0.98,
+            width: captureWidth,
+            height: captureHeight,
+          }}
+          style={[styles.viewShot, { width: composerWidth, height: composerHeight }]}
         >
           {captureData ? (
             <ComposerOverlay
@@ -139,6 +156,7 @@ export default function PreviewScreen() {
               location={captureData.location}
               imageWidth={composerWidth}
               imageHeight={composerHeight}
+              scale={scale}
             />
           ) : (
             <View style={styles.mockPlaceholder}>
