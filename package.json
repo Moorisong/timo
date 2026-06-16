@@ -62,7 +62,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "jest"
+    "test": "jest",
+    "build:android": "eas build --platform android --profile production",
+    "build:android-local": "chmod +x ./scripts/build-android.sh && ./scripts/build-android.sh"
   },
   "private": true
 }
