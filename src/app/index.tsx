@@ -3,10 +3,10 @@
  * 실시간 카메라 프리뷰, GPS 상태, 워터마크 표시
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Settings, MapPin } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -22,7 +22,13 @@ import type { CaptureData } from '@/types';
 export default function CameraScreen() {
   const router = useRouter();
   const [now, setNow] = useState(new Date());
-  const { settings } = useSettings();
+  const { settings, updateField, loadSettings } = useSettings();
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSettings();
+    }, [loadSettings])
+  );
   const { cameraRef, hasPermission, isCapturing, requestPermission, takePicture } =
     useCamera();
   const { gpsInfo } = useLocation(settings.locationEnabled);
@@ -93,35 +99,37 @@ export default function CameraScreen() {
       <SafeAreaView edges={['bottom']} style={styles.bottomControls}>
         <View style={styles.controlsRow}>
           {/* Location Toggle */}
-          <Pressable
-            style={[
-              styles.locationChip,
-              settings.locationEnabled && styles.locationChipActive,
-            ]}
-            onPress={() => router.push('/settings')}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel={
-              settings.locationEnabled ? '위치 켜짐' : '위치 꺼짐'
-            }
-          >
-            <MapPin
-              size={12}
-              color={
-                settings.locationEnabled
-                  ? COLORS.primaryLight
-                  : COLORS.textSecondary
-              }
-            />
-            <Text
+          <View style={styles.sideControlWrapper}>
+            <Pressable
               style={[
-                styles.locationChipText,
-                settings.locationEnabled && styles.locationChipTextActive,
+                styles.locationChip,
+                settings.locationEnabled && styles.locationChipActive,
               ]}
+              onPress={() => updateField('locationEnabled', !settings.locationEnabled)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={
+                settings.locationEnabled ? '위치 켜짐' : '위치 꺼짐'
+              }
             >
-              {settings.locationEnabled ? '위치 켜짐' : '위치 꺼짐'}
-            </Text>
-          </Pressable>
+              <MapPin
+                size={12}
+                color={
+                  settings.locationEnabled
+                    ? COLORS.primaryLight
+                    : COLORS.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.locationChipText,
+                  settings.locationEnabled && styles.locationChipTextActive,
+                ]}
+              >
+                {settings.locationEnabled ? '위치\n켜짐' : '위치\n꺼짐'}
+              </Text>
+            </Pressable>
+          </View>
 
           {/* Capture Button */}
           <CaptureButton
@@ -130,16 +138,18 @@ export default function CameraScreen() {
           />
 
           {/* Settings Button */}
-          <Pressable
-            style={styles.settingsButton}
-            onPress={() => router.push('/settings')}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="설정 화면 열기"
-            accessibilityHint="탭하면 설정 화면으로 이동합니다"
-          >
-            <Settings size={18} color={COLORS.textPrimary} />
-          </Pressable>
+          <View style={[styles.sideControlWrapper, { alignItems: 'flex-end' }]}>
+            <Pressable
+              style={styles.settingsButton}
+              onPress={() => router.push('/settings')}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="설정 화면 열기"
+              accessibilityHint="탭하면 설정 화면으로 이동합니다"
+            >
+              <Settings size={18} color={COLORS.textPrimary} />
+            </Pressable>
+          </View>
         </View>
       </SafeAreaView>
     </View>
@@ -224,12 +234,19 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(59,130,246,0.5)',
   },
   locationChipText: {
-    fontSize: 12,
+    fontSize: 10,
+    lineHeight: 12,
     fontWeight: '500',
     color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
   },
   locationChipTextActive: {
     color: '#93C5FD',
+  },
+  sideControlWrapper: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   settingsButton: {
     width: 40,

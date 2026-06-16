@@ -88,7 +88,6 @@ export default function useSettings(): UseSettingsReturn {
       ];
 
       await AsyncStorage.multiSet(pairs);
-      Alert.alert('저장 완료', '설정이 저장되었습니다.');
       return true;
     } catch (error) {
       if (__DEV__) {

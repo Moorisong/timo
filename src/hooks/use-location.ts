@@ -32,8 +32,33 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
         });
         if (results.length > 0) {
           const addr = results[0];
-          const parts = [addr.city, addr.country].filter(Boolean);
-          return parts.join(', ') || null;
+          const parts: string[] = [];
+          
+          if (addr.country) {
+            parts.push(addr.country);
+          }
+          if (addr.region && addr.region !== addr.country) {
+            parts.push(addr.region);
+          }
+          if (addr.subregion && addr.subregion !== addr.region) {
+            parts.push(addr.subregion);
+          }
+          if (addr.city && addr.city !== addr.subregion && addr.city !== addr.region) {
+            parts.push(addr.city);
+          }
+          if (addr.district && addr.district !== addr.city && addr.district !== addr.subregion) {
+            parts.push(addr.district);
+          }
+          if (addr.street) {
+            parts.push(addr.street);
+          }
+          if (addr.streetNumber) {
+            parts.push(addr.streetNumber);
+          } else if (addr.name && addr.name !== addr.street && addr.name !== addr.district) {
+            parts.push(addr.name);
+          }
+          
+          return parts.filter(Boolean).join(' ') || null;
         }
         return null;
       } catch {

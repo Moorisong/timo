@@ -23,10 +23,45 @@ export function generateFileName(date: Date): string {
 
 /**
  * MediaLibrary 권한 요청
+ * Android 13 이상에서 Audio 권한 누락으로 인한 getPermissionsAsync/requestPermissionsAsync 예외 차단
  */
 export async function requestMediaPermission(): Promise<boolean> {
-  const { status } = await MediaLibrary.requestPermissionsAsync();
-  return status === 'granted';
+  try {
+    // getPermissionsAsync에 true를 인자로 직접 전달합니다.
+    const existing = await MediaLibrary.getPermissionsAsync(true);
+    if (existing.granted) {
+      return true;
+    }
+    const { status } = await MediaLibrary.requestPermissionsAsync(true);
+    return status === 'granted';
+  } catch (error) {
+    try {
+      // options object 형태로 { writeOnly: true } 전달 시도
+      const existing = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
+      if (existing.granted) {
+        return true;
+      }
+      const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
+      return status === 'granted';
+    } catch (innerError) {
+      try {
+        // iOS 등 writeOnly가 실패할 경우 기본 권한 요청 시도 (Android 13 미만 대응)
+        const existing = await MediaLibrary.getPermissionsAsync();
+        if (existing.granted) {
+          return true;
+        }
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        return status === 'granted';
+      } catch (finalError) {
+        if (__DEV__) {
+          console.error('Media permission request failed:', finalError);
+        }
+        // 권한 관련 에러가 발생해도 createAssetAsync 시점에 OS 권한 승인 팝업이 뜨게 되거나
+        // 사용자가 권한 확인을 할 수 있으므로 에러를 던지지 않고 false를 반환합니다.
+        return false;
+      }
+    }
+  }
 }
 
 /**
@@ -36,19 +71,28 @@ export async function requestMediaPermission(): Promise<boolean> {
  */
 export async function saveImageToGallery(uri: string): Promise<boolean> {
   try {
+    // 1. 먼저 권한 체크 및 요청을 시도합니다.
     const granted = await requestMediaPermission();
-    if (!granted) {
-      return false;
-    }
-
+    
+    // 2. 권한 획득 여부와 관계없이, createAssetAsync를 직접 실행하여 네이티브에서 필요한 경우 권한 창이 뜨도록 유도합니다.
+    // getPermissionsAsync에서 CodedError를 뱉더라도 실제 이미지를 저장하는 시점에 시스템이 권한 팝업을 띄워줄 수 있습니다.
     const asset = await MediaLibrary.createAssetAsync(uri);
 
-    // Timo 앨범에 저장
-    let album = await MediaLibrary.getAlbumAsync(SAVE_ALBUM_NAME);
-    if (album === null) {
-      await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, false);
-    } else {
-      await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+    // 3. 사용자가 기본 카메라 앨범에 저장을 요청했으므로, 앨범명을 'Camera'로 설정했을 경우
+    // 별도의 커스텀 앨범(Timo 등)으로 이동/복사 작업을 생략하여 getAlbumAsync 에러를 우회합니다.
+    if (SAVE_ALBUM_NAME !== 'Camera' && SAVE_ALBUM_NAME !== 'camera') {
+      try {
+        let album = await MediaLibrary.getAlbumAsync(SAVE_ALBUM_NAME);
+        if (album === null) {
+          await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, false);
+        } else {
+          await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+        }
+      } catch (albumError) {
+        if (__DEV__) {
+          console.warn('앨범 저장/이동 실패 (무시됨):', albumError);
+        }
+      }
     }
 
     return true;
