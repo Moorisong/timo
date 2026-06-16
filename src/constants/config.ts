@@ -12,7 +12,7 @@ export const MAX_COMMENT_LENGTH = 20;
 export const TIMESTAMP_FORMAT = 'yyyy-MM-dd HH:mm:ss';
 
 /** 이미지 저장 관련 */
-export const SAVE_ALBUM_NAME = 'Camera';
+export const SAVE_ALBUM_NAME = 'Timo';
 export const SAVE_FILE_PREFIX = 'Timo_';
 
 /** 워터마크 텍스트 */

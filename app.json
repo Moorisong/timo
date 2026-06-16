@@ -28,7 +28,11 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_BINARY_AND_TEXT_RESOURCES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO"
       ]
     },
     "web": {
@@ -65,7 +69,8 @@
         "expo-media-library",
         {
           "photosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 접근이 필요합니다.",
-          "savePhotosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 저장 권한이 필요합니다."
+          "savePhotosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 저장 권한이 필요합니다.",
+          "saveAudioPermission": "촬영된 사진을 갤러리에 저장하기 위해 오디오 권한이 필요합니다."
         }
       ]
     ],

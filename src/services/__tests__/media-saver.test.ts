@@ -12,7 +12,7 @@ jest.mock('expo-media-library', () => ({
 
 // Mock Constants
 jest.mock('@/constants', () => ({
-  SAVE_ALBUM_NAME: 'Camera',
+  SAVE_ALBUM_NAME: 'Timo',
   SAVE_FILE_PREFIX: 'Timo_',
 }));
 
@@ -31,7 +31,7 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith(true);
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
       expect(MediaLibrary.requestPermissionsAsync).not.toHaveBeenCalled();
     });
 
@@ -48,8 +48,8 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith(true);
-      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith(true);
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
+      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
     });
 
     it('권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
@@ -86,20 +86,41 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
     });
 
-    it('권한이 있고 앨범명이 "Camera"인 경우 앨범 생성/이동 없이 true를 반환해야 한다', async () => {
+    it('권한이 있고 Timo 앨범이 존재하지 않는 경우, 앨범을 생성하고 자산을 추가해야 한다', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: true,
         status: 'granted',
       });
       const mockAsset = { id: 'asset-1' };
       (MediaLibrary.createAssetAsync as jest.Mock).mockResolvedValue(mockAsset);
+      (MediaLibrary.getAlbumAsync as jest.Mock).mockResolvedValue(null);
+      (MediaLibrary.createAlbumAsync as jest.Mock).mockResolvedValue({ id: 'album-1' });
 
       const result = await saveImageToGallery('file://test.jpg');
 
       expect(result).toBe(true);
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
-      expect(MediaLibrary.getAlbumAsync).not.toHaveBeenCalled();
+      expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
+      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, false);
+    });
+
+    it('권한이 있고 Timo 앨범이 이미 존재하는 경우, 앨범을 생성하지 않고 기존 앨범에 자산을 추가해야 한다', async () => {
+      (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
+        granted: true,
+        status: 'granted',
+      });
+      const mockAsset = { id: 'asset-1' };
+      (MediaLibrary.createAssetAsync as jest.Mock).mockResolvedValue(mockAsset);
+      const mockAlbum = { id: 'album-1', title: 'Timo' };
+      (MediaLibrary.getAlbumAsync as jest.Mock).mockResolvedValue(mockAlbum);
+
+      const result = await saveImageToGallery('file://test.jpg');
+
+      expect(result).toBe(true);
+      expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
+      expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
       expect(MediaLibrary.createAlbumAsync).not.toHaveBeenCalled();
+      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, false);
     });
   });
 });

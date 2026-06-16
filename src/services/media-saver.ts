@@ -27,39 +27,27 @@ export function generateFileName(date: Date): string {
  */
 export async function requestMediaPermission(): Promise<boolean> {
   try {
-    // getPermissionsAsync에 true를 인자로 직접 전달합니다.
-    const existing = await MediaLibrary.getPermissionsAsync(true);
+    // getPermissionsAsync에 writeOnly 옵션을 전달하여 AUDIO 권한 체크 예외를 우회합니다.
+    const existing = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
     if (existing.granted) {
       return true;
     }
-    const { status } = await MediaLibrary.requestPermissionsAsync(true);
+    const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
     return status === 'granted';
   } catch (error) {
     try {
-      // options object 형태로 { writeOnly: true } 전달 시도
-      const existing = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
+      // options object 형태가 실패할 경우 기본 권한 요청 시도 (iOS 등 대응)
+      const existing = await MediaLibrary.getPermissionsAsync();
       if (existing.granted) {
         return true;
       }
-      const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
+      const { status } = await MediaLibrary.requestPermissionsAsync();
       return status === 'granted';
     } catch (innerError) {
-      try {
-        // iOS 등 writeOnly가 실패할 경우 기본 권한 요청 시도 (Android 13 미만 대응)
-        const existing = await MediaLibrary.getPermissionsAsync();
-        if (existing.granted) {
-          return true;
-        }
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        return status === 'granted';
-      } catch (finalError) {
-        if (__DEV__) {
-          console.error('Media permission request failed:', finalError);
-        }
-        // 권한 관련 에러가 발생해도 createAssetAsync 시점에 OS 권한 승인 팝업이 뜨게 되거나
-        // 사용자가 권한 확인을 할 수 있으므로 에러를 던지지 않고 false를 반환합니다.
-        return false;
+      if (__DEV__) {
+        console.warn('미디어 권한 요청 불가 (시뮬레이터/Expo Go 제한):', innerError);
       }
+      return false;
     }
   }
 }
@@ -90,7 +78,7 @@ export async function saveImageToGallery(uri: string): Promise<boolean> {
         }
       } catch (albumError) {
         if (__DEV__) {
-          console.warn('앨범 저장/이동 실패 (무시됨):', albumError);
+          console.warn('Timo 앨범 저장/이동 생략 (Expo Go 미지원 권한 우회):', albumError);
         }
       }
     }
@@ -98,7 +86,7 @@ export async function saveImageToGallery(uri: string): Promise<boolean> {
     return true;
   } catch (error) {
     if (__DEV__) {
-      console.error('이미지 저장 실패:', error);
+      console.warn('이미지 저장 실패:', error);
     }
     return false;
   }
