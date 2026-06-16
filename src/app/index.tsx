@@ -14,7 +14,7 @@ import { COLORS, WATERMARK_TEXT } from '@/constants';
 import useCamera from '@/hooks/use-camera';
 import useLocation from '@/hooks/use-location';
 import useSettings from '@/hooks/use-settings';
-import { CameraPreview, GpsStatusBar, CaptureButton } from '@/components/camera';
+import { CameraPreview, CaptureButton } from '@/components/camera';
 import { formatTimestamp } from '@/utils/format-date';
 
 import type { CaptureData } from '@/types';
@@ -85,14 +85,16 @@ export default function CameraScreen() {
 
       {/* Top Bar */}
       <SafeAreaView edges={['top']} style={styles.topBar}>
-        <GpsStatusBar
-          gpsInfo={gpsInfo}
-          locationEnabled={settings.locationEnabled}
-        />
-        <View style={styles.watermarkGroup}>
-          <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
-          <Text style={styles.watermarkTime}>{formatTimestamp(now)}</Text>
-        </View>
+        <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
+        {(() => {
+          const [datePart, timePart] = formatTimestamp(now).split('\n');
+          return (
+            <View style={styles.timeBadge}>
+              <Text style={styles.dateText}>{datePart}</Text>
+              <Text style={styles.timeText}>{timePart}</Text>
+            </View>
+          );
+        })()}
       </SafeAreaView>
 
       {/* Bottom Controls */}
@@ -180,28 +182,50 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     zIndex: 10,
   },
-  watermarkGroup: {
+  watermarkTitle: {
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  timeBadge: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'flex-end',
   },
-  watermarkTitle: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 15,
-    fontWeight: '600',
-    letterSpacing: 1.2,
-  },
-  watermarkTime: {
-    color: 'rgba(255,255,255,0.45)',
+  dateText: {
+    color: 'rgba(255,255,255,0.7)',
     fontSize: 10,
-    letterSpacing: 0.2,
-    marginTop: 2,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  timeText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
     fontVariant: ['tabular-nums'],
+    marginTop: 1,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    textAlign: 'right',
   },
   bottomControls: {
     position: 'absolute',
