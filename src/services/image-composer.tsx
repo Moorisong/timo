@@ -21,6 +21,34 @@ interface ComposerOverlayProps {
 }
 
 /**
+ * 설정과 위치 정보 데이터를 기반으로 3줄 메타데이터 목록 배열 반환
+ */
+export function composeMetadataList(settings: Settings, location: LocationData | null): string[] {
+  const list: string[] = [];
+
+  // 1. 첫 줄: 기관명 / 담당자
+  if (settings.agencyName || settings.inspectorName) {
+    const combined = [settings.agencyName, settings.inspectorName].filter(Boolean).join(' / ');
+    if (combined) {
+      list.push(combined);
+    }
+  }
+
+  // 2. 두 번째 줄: 위치 정보
+  const showLocation = settings.locationEnabled && location?.address;
+  if (showLocation && location?.address) {
+    list.push(location.address);
+  }
+
+  // 3. 세 번째 줄: 메모
+  if (settings.comment) {
+    list.push(settings.comment);
+  }
+
+  return list;
+}
+
+/**
  * 합성용 오프스크린 View 컴포넌트
  * react-native-view-shot으로 캡처하여 최종 이미지 생성
  */
@@ -32,13 +60,8 @@ export default function ComposerOverlay({
   imageWidth,
   imageHeight,
 }: ComposerOverlayProps) {
-  const hasMetadata = !!(
-    settings.agencyName ||
-    settings.inspectorName ||
-    settings.comment
-  );
-  const showLocation =
-    settings.locationEnabled && location?.address;
+  const metadataList = composeMetadataList(settings, location);
+  const showOverlay = metadataList.length > 0;
 
   return (
     <View style={[styles.container, { width: imageWidth, height: imageHeight }]}>
@@ -49,38 +72,45 @@ export default function ComposerOverlay({
         contentFit="cover"
       />
 
-      {/* 우측 상단: 워터마크 + 타임스탬프 */}
-      <View style={styles.watermarkContainer}>
-        <View style={styles.watermarkBg}>
-          <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
-          <Text style={styles.watermarkTime}>{timestamp}</Text>
-        </View>
+      {/* 상단 워터마크 (좌측) */}
+      <View style={styles.watermarkContainerLeft}>
+        <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
+      </View>
+
+      {/* 상단 날짜 (우측) */}
+      <View style={styles.watermarkContainerRight}>
+        {(() => {
+          const [datePart, timePart] = timestamp.split('\n');
+          return (
+            <View style={styles.timeBadge}>
+              <Text style={styles.dateText}>{datePart}</Text>
+              <Text style={styles.timeText}>{timePart}</Text>
+            </View>
+          );
+        })()}
       </View>
 
       {/* 하단: 메타데이터 오버레이 */}
-      {(hasMetadata || showLocation) && (
+      {showOverlay && (
         <View style={styles.metadataContainer}>
           <View style={styles.metadataBg}>
-            {!!settings.agencyName && (
-              <Text style={styles.metadataAgency}>
-                {settings.agencyName}
-              </Text>
-            )}
-            {!!settings.inspectorName && (
-              <Text style={styles.metadataText}>
-                {settings.inspectorName}
-              </Text>
-            )}
-            {!!settings.comment && (
-              <Text style={styles.metadataText}>
-                {settings.comment}
-              </Text>
-            )}
-            {showLocation && (
-              <Text style={styles.metadataLocation}>
-                📍 {location?.address}
-              </Text>
-            )}
+            {metadataList.map((item, idx) => {
+              const isFirst = idx === 0;
+              const isLocation = location?.address === item;
+
+              let textStyle = styles.metadataText;
+              if (isFirst) {
+                textStyle = styles.metadataAgency;
+              } else if (isLocation) {
+                textStyle = styles.metadataLocation;
+              }
+
+              return (
+                <Text key={idx} style={textStyle} numberOfLines={1}>
+                  {item}
+                </Text>
+              );
+            })}
           </View>
         </View>
       )}
@@ -96,30 +126,53 @@ const styles = StyleSheet.create({
   image: {
     ...StyleSheet.absoluteFillObject,
   },
-  watermarkContainer: {
+  watermarkContainerLeft: {
     position: 'absolute',
-    top: 16,
-    right: 16,
-    alignItems: 'flex-end',
+    top: 10,
+    left: 12,
   },
-  watermarkBg: {
-    backgroundColor: 'rgba(0,0,0,0.45)',
+  watermarkContainerRight: {
+    position: 'absolute',
+    top: 10,
+    right: 12,
+  },
+  timeBadge: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'flex-end',
   },
   watermarkTitle: {
     color: 'rgba(255,255,255,0.95)',
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     letterSpacing: 1.5,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
-  watermarkTime: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: 12,
+  dateText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  timeText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
     fontVariant: ['tabular-nums'],
-    marginTop: 2,
+    marginTop: 1,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    textAlign: 'right',
   },
   metadataContainer: {
     position: 'absolute',
@@ -129,22 +182,21 @@ const styles = StyleSheet.create({
   },
   metadataBg: {
     backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 16,
+    padding: 12,
   },
   metadataAgency: {
     color: 'rgba(255,255,255,0.95)',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     marginBottom: 2,
   },
   metadataText: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
-    marginBottom: 1,
-  },
-  metadataLocation: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 11,
-    marginTop: 4,
+  },
+  metadataLocation: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 12,
+    marginBottom: 2,
   },
 });
