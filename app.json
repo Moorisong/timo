@@ -7,22 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "timo",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/images/icon.png",
-      "infoPlist": {
-        "NSCameraUsageDescription": "현장 사진 촬영을 위해 카메라 접근이 필요합니다.",
-        "NSLocationWhenInUseUsageDescription": "촬영 사진에 위치 정보를 기록하기 위해 위치 접근이 필요합니다.",
-        "NSPhotoLibraryAddUsageDescription": "촬영된 사진을 갤러리에 저장하기 위해 사진 접근이 필요합니다."
-      }
-    },
+
     "android": {
       "package": "com.timo.android",
-      "versionCode": 2,
+      "versionCode": 6,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#208AEF",
+        "foregroundImage": "./assets/images/android-icon-foreground-white.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [

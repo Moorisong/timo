@@ -2,7 +2,7 @@
  * Settings Screen 스타일
  */
 
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { COLORS } from '@/constants';
 
@@ -232,17 +232,7 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    elevation: 6,
   },
   saveButtonText: {
     color: '#FFF',

@@ -2,7 +2,7 @@
  * Preview Screen 스타일
  */
 
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { COLORS } from '@/constants';
 
@@ -113,17 +113,7 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    elevation: 8,
   },
   actionText: {
     color: 'rgba(255,255,255,0.5)',

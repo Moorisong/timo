@@ -35,20 +35,10 @@ export async function requestMediaPermission(): Promise<boolean> {
     const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
     return status === 'granted';
   } catch (error) {
-    try {
-      // options object 형태가 실패할 경우 기본 권한 요청 시도 (iOS 등 대응)
-      const existing = await MediaLibrary.getPermissionsAsync();
-      if (existing.granted) {
-        return true;
-      }
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      return status === 'granted';
-    } catch (innerError) {
-      if (__DEV__) {
-        console.warn('미디어 권한 요청 불가 (시뮬레이터/Expo Go 제한):', innerError);
-      }
-      return false;
+    if (__DEV__) {
+      console.warn('미디어 권한 요청 불가 (시뮬레이터/Expo Go 제한):', error);
     }
+    return false;
   }
 }
 

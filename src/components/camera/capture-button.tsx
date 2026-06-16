@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, StyleSheet, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 
 import { COLORS } from '@/constants';
 
@@ -66,16 +66,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 24,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    elevation: 8,
   },
 });
