@@ -32,6 +32,21 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
         });
         if (results.length > 0) {
           const addr = results[0];
+          // 1. formattedAddress가 존재하는 경우 우선 사용 (대한민국 등 불필요한 국가명 접두사 제거)
+          if (addr.formattedAddress) {
+            let cleanAddr = addr.formattedAddress;
+            // '대한민국 ' 또는 'South Korea ' 제거
+            cleanAddr = cleanAddr.replace(/^(대한민국|South Korea)\s+/, '');
+            // 뒤쪽에 ', 대한민국' 또는 ', South Korea'가 붙는 경우 제거
+            cleanAddr = cleanAddr.replace(/,\s*(대한민국|South Korea)$/, '');
+            // 혹시 콤마로 역순 배치된 영어식 포맷인 경우 한글/기존 순서로 원복할 수도 있으나, 보통 한국 로케일이면 올바른 순서로 들어옵니다.
+            // 만약 콤마가 포함되어 있다면 콤마와 양끝 공백을 다듬어줍니다.
+            if (cleanAddr.trim()) {
+              return cleanAddr.trim();
+            }
+          }
+
+          // 2. formattedAddress가 없을 때의 Fallback 조합 로직
           const parts: string[] = [];
           
           if (addr.country) {
@@ -54,7 +69,12 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
           }
           if (addr.streetNumber) {
             parts.push(addr.streetNumber);
-          } else if (addr.name && addr.name !== addr.street && addr.name !== addr.district) {
+          }
+          if (addr.name && 
+              addr.name !== addr.street && 
+              addr.name !== addr.streetNumber && 
+              addr.name !== addr.district && 
+              addr.name !== addr.city) {
             parts.push(addr.name);
           }
           

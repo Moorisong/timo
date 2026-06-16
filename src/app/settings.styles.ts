@@ -95,11 +95,24 @@ export const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.4)',
     fontSize: 12,
   },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
   input: {
+    flex: 1,
     color: COLORS.textPrimary,
     fontSize: 15,
     padding: 0,
     margin: 0,
+    paddingRight: 10,
+  },
+  clearButton: {
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   helperText: {
     color: 'rgba(255,255,255,0.4)',

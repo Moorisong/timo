@@ -14,6 +14,7 @@ import {
   User,
   Building2,
   StickyNote,
+  X,
 } from 'lucide-react-native';
 
 import {
@@ -85,22 +86,36 @@ export default function SettingsScreen() {
                 {settings.agencyName.length}/{MAX_AGENCY_NAME_LENGTH}
               </Text>
             </View>
-            <TextInput
-              style={styles.input}
-              value={settings.agencyName}
-              onChangeText={(t) =>
-                updateField(
-                  'agencyName',
-                  t.slice(0, MAX_AGENCY_NAME_LENGTH)
-                )
-              }
-              placeholder="예: 환경부 한강유역환경청"
-              placeholderTextColor="rgba(255,255,255,0.4)"
-              autoCapitalize="none"
-              autoCorrect={false}
-              accessible={true}
-              accessibilityLabel="기관명 입력"
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={settings.agencyName}
+                onChangeText={(t) =>
+                  updateField(
+                    'agencyName',
+                    t.slice(0, MAX_AGENCY_NAME_LENGTH)
+                  )
+                }
+                placeholder="예: 환경부 한강유역환경청"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessible={true}
+                accessibilityLabel="기관명 입력"
+              />
+              {settings.agencyName.length > 0 && (
+                <Pressable
+                  onPress={() => updateField('agencyName', '')}
+                  style={styles.clearButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="기관명 지우기"
+                >
+                  <X size={16} color={COLORS.textMuted} />
+                </Pressable>
+              )}
+            </View>
           </View>
 
           <View style={styles.divider} />
@@ -116,22 +131,36 @@ export default function SettingsScreen() {
                 {settings.inspectorName.length}/{MAX_INSPECTOR_NAME_LENGTH}
               </Text>
             </View>
-            <TextInput
-              style={styles.input}
-              value={settings.inspectorName}
-              onChangeText={(t) =>
-                updateField(
-                  'inspectorName',
-                  t.slice(0, MAX_INSPECTOR_NAME_LENGTH)
-                )
-              }
-              placeholder="예: 김준호"
-              placeholderTextColor="rgba(255,255,255,0.4)"
-              autoCapitalize="none"
-              autoCorrect={false}
-              accessible={true}
-              accessibilityLabel="담당자명 입력"
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={settings.inspectorName}
+                onChangeText={(t) =>
+                  updateField(
+                    'inspectorName',
+                    t.slice(0, MAX_INSPECTOR_NAME_LENGTH)
+                  )
+                }
+                placeholder="예: 김준호"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessible={true}
+                accessibilityLabel="담당자명 입력"
+              />
+              {settings.inspectorName.length > 0 && (
+                <Pressable
+                  onPress={() => updateField('inspectorName', '')}
+                  style={styles.clearButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="담당자명 지우기"
+                >
+                  <X size={16} color={COLORS.textMuted} />
+                </Pressable>
+              )}
+            </View>
           </View>
 
           <View style={styles.divider} />
@@ -147,19 +176,33 @@ export default function SettingsScreen() {
                 {settings.comment.length}/{MAX_COMMENT_LENGTH}
               </Text>
             </View>
-            <TextInput
-              style={styles.input}
-              value={settings.comment}
-              onChangeText={(t) =>
-                updateField('comment', t.slice(0, MAX_COMMENT_LENGTH))
-              }
-              placeholder="예: 현장 점검 #047"
-              placeholderTextColor="rgba(255,255,255,0.4)"
-              autoCapitalize="none"
-              autoCorrect={false}
-              accessible={true}
-              accessibilityLabel="메모 입력"
-            />
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={settings.comment}
+                onChangeText={(t) =>
+                  updateField('comment', t.slice(0, MAX_COMMENT_LENGTH))
+                }
+                placeholder="예: 현장 점검 #047"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessible={true}
+                accessibilityLabel="메모 입력"
+              />
+              {settings.comment.length > 0 && (
+                <Pressable
+                  onPress={() => updateField('comment', '')}
+                  style={styles.clearButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="메모 지우기"
+                >
+                  <X size={16} color={COLORS.textMuted} />
+                </Pressable>
+              )}
+            </View>
           </View>
         </View>
 

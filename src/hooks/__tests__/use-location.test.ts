@@ -33,6 +33,7 @@ jest.mock('expo-location', () => ({
       street: '마포대로',
       streetNumber: '123',
       name: '마포빌딩',
+      formattedAddress: '대한민국 서울특별시 마포구 아현동 마포대로 123 마포빌딩',
     },
   ]),
   Accuracy: {
@@ -59,7 +60,7 @@ describe('useLocation Hook 테스트', () => {
     expect(result.current.gpsInfo.location).toEqual({
       latitude: 37.5665,
       longitude: 126.9780,
-      address: '대한민국 서울특별시 마포구 아현동 마포대로 123',
+      address: '서울특별시 마포구 아현동 마포대로 123 마포빌딩',
     });
   });
 
@@ -72,6 +73,6 @@ describe('useLocation Hook 테스트', () => {
 
     expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
     expect(result.current.gpsInfo.status).toBe('GPS_OK');
-    expect(result.current.gpsInfo.location?.address).toBe('대한민국 서울특별시 마포구 아현동 마포대로 123');
+    expect(result.current.gpsInfo.location?.address).toBe('서울특별시 마포구 아현동 마포대로 123 마포빌딩');
   });
 });
