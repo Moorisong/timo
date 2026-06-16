@@ -44,3 +44,10 @@ example
 
 # local sample directory
 /sample/
+
+# build outputs and secrets
+*.aab
+credentials.json
+
+# AI agent working rules
+AGENTS.md
