@@ -3,10 +3,9 @@
  * AsyncStorage 기반 설정 저장/로드
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, ScrollView, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
@@ -23,16 +22,17 @@ import {
   MAX_AGENCY_NAME_LENGTH,
   MAX_INSPECTOR_NAME_LENGTH,
   MAX_COMMENT_LENGTH,
-  WATERMARK_TEXT,
 } from '@/constants';
 import useSettings from '@/hooks/use-settings';
-import { formatTimestamp } from '@/utils/format-date';
+import { SettingsPreview } from '@/components/settings-preview';
 
 import { styles } from './settings.styles';
+
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { settings, isLoaded, updateField, saveSettings } = useSettings();
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSave = async () => {
     const success = await saveSettings();
@@ -75,8 +75,13 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>보고서 정보</Text>
         </View>
 
-        <View style={styles.card}>
-          {/* Agency Name */}
+        {/* Agency Name */}
+        <View
+          style={[
+            styles.inputCard,
+            focusedField === 'agencyName' && styles.inputCardFocused,
+          ]}
+        >
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <View style={styles.labelGroup}>
@@ -97,6 +102,8 @@ export default function SettingsScreen() {
                     t.slice(0, MAX_AGENCY_NAME_LENGTH)
                   )
                 }
+                onFocus={() => setFocusedField('agencyName')}
+                onBlur={() => setFocusedField(null)}
                 placeholder="예: 환경부 한강유역환경청"
                 placeholderTextColor="rgba(255,255,255,0.4)"
                 autoCapitalize="none"
@@ -118,10 +125,15 @@ export default function SettingsScreen() {
               )}
             </View>
           </View>
+        </View>
 
-          <View style={styles.divider} />
-
-          {/* Inspector Name */}
+        {/* Inspector Name */}
+        <View
+          style={[
+            styles.inputCard,
+            focusedField === 'inspectorName' && styles.inputCardFocused,
+          ]}
+        >
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <View style={styles.labelGroup}>
@@ -142,6 +154,8 @@ export default function SettingsScreen() {
                     t.slice(0, MAX_INSPECTOR_NAME_LENGTH)
                   )
                 }
+                onFocus={() => setFocusedField('inspectorName')}
+                onBlur={() => setFocusedField(null)}
                 placeholder="예: 김준호"
                 placeholderTextColor="rgba(255,255,255,0.4)"
                 autoCapitalize="none"
@@ -163,10 +177,15 @@ export default function SettingsScreen() {
               )}
             </View>
           </View>
+        </View>
 
-          <View style={styles.divider} />
-
-          {/* Notes */}
+        {/* Notes */}
+        <View
+          style={[
+            styles.inputCard,
+            focusedField === 'comment' && styles.inputCardFocused,
+          ]}
+        >
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <View style={styles.labelGroup}>
@@ -184,6 +203,8 @@ export default function SettingsScreen() {
                 onChangeText={(t) =>
                   updateField('comment', t.slice(0, MAX_COMMENT_LENGTH))
                 }
+                onFocus={() => setFocusedField('comment')}
+                onBlur={() => setFocusedField(null)}
                 placeholder="예: 현장 점검 #047"
                 placeholderTextColor="rgba(255,255,255,0.4)"
                 autoCapitalize="none"
@@ -230,106 +251,32 @@ export default function SettingsScreen() {
               />
             </View>
           </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.switchGroup}>
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>위치 정보 표시</Text>
+              <Switch
+                value={settings.locationEnabled}
+                onValueChange={(val) => updateField('locationEnabled', val)}
+                trackColor={{ false: '#333', true: COLORS.primary }}
+                thumbColor={settings.locationEnabled ? '#FFF' : '#AAA'}
+                accessible={true}
+                accessibilityLabel="위치 정보 표시 설정 토글"
+              />
+            </View>
+          </View>
         </View>
 
         {/* Preview */}
-        {(settings.agencyName ||
-          settings.inspectorName ||
-          settings.comment) ? (
-          <View style={styles.previewSection}>
-            <Text style={styles.sectionTitle}>사진 미리보기</Text>
-            <View style={styles.previewCard}>
-              <Image
-                source={require('@/../assets/images/preview_placeholder.png')}
-                style={styles.previewImage}
-                contentFit="cover"
-              />
-              <View
-                style={[
-                  styles.previewOverlay,
-                  !settings.metadataBackgroundEnabled && styles.previewOverlayNoBg,
-                ]}
-              >
-                {(!!settings.agencyName || !!settings.inspectorName) && (
-                  <Text
-                    style={[
-                      styles.previewAgency,
-                      !settings.metadataBackgroundEnabled && {
-                        textShadowColor: 'rgba(0,0,0,0.7)',
-                        textShadowOffset: { width: 0, height: 1 },
-                        textShadowRadius: 3,
-                      },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {[settings.agencyName, settings.inspectorName].filter(Boolean).join(' / ')}
-                  </Text>
-                )}
-                {!!settings.comment && (
-                  <Text
-                    style={[
-                      styles.previewText,
-                      !settings.metadataBackgroundEnabled && {
-                        textShadowColor: 'rgba(0,0,0,0.7)',
-                        textShadowOffset: { width: 0, height: 1 },
-                        textShadowRadius: 3,
-                      },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {settings.comment}
-                  </Text>
-                )}
-              </View>
-              {/* 워터마크 미리보기 (좌측) */}
-              <View style={styles.previewWatermarkLeft}>
-                <Text style={styles.watermarkTitle}>{WATERMARK_TEXT}</Text>
-              </View>
-              {/* 날짜 미리보기 (우측) */}
-              <View style={styles.previewWatermarkRight}>
-                {(() => {
-                  const [datePart, timePart] = formatTimestamp(new Date()).split('\n');
-                  return (
-                    <View
-                      style={[
-                        styles.timeBadge,
-                        !settings.metadataBackgroundEnabled && {
-                          backgroundColor: 'transparent',
-                          borderColor: 'transparent',
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.dateText,
-                          !settings.metadataBackgroundEnabled && {
-                            textShadowColor: 'rgba(0,0,0,0.7)',
-                            textShadowOffset: { width: 0, height: 1 },
-                            textShadowRadius: 3,
-                          },
-                        ]}
-                      >
-                        {datePart}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          !settings.metadataBackgroundEnabled && {
-                            textShadowColor: 'rgba(0,0,0,0.7)',
-                            textShadowOffset: { width: 0, height: 1 },
-                            textShadowRadius: 3,
-                          },
-                        ]}
-                      >
-                        {timePart}
-                      </Text>
-                    </View>
-                  );
-                })()}
-              </View>
-            </View>
-          </View>
-        ) : null}
+        <SettingsPreview
+          agencyName={settings.agencyName}
+          inspectorName={settings.inspectorName}
+          comment={settings.comment}
+          metadataBackgroundEnabled={settings.metadataBackgroundEnabled}
+          locationEnabled={settings.locationEnabled}
+        />
 
         <Pressable
           style={styles.saveButton}

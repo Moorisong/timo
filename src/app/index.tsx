@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Settings, MapPin } from 'lucide-react-native';
+import { Settings } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { COLORS, WATERMARK_TEXT } from '@/constants';
@@ -100,38 +100,8 @@ export default function CameraScreen() {
       {/* Bottom Controls */}
       <SafeAreaView edges={['bottom']} style={styles.bottomControls}>
         <View style={styles.controlsRow}>
-          {/* Location Toggle */}
-          <View style={styles.sideControlWrapper}>
-            <Pressable
-              style={[
-                styles.locationChip,
-                settings.locationEnabled && styles.locationChipActive,
-              ]}
-              onPress={() => updateField('locationEnabled', !settings.locationEnabled)}
-              accessible={true}
-              accessibilityRole="button"
-              accessibilityLabel={
-                settings.locationEnabled ? '위치 켜짐' : '위치 꺼짐'
-              }
-            >
-              <MapPin
-                size={12}
-                color={
-                  settings.locationEnabled
-                    ? COLORS.primaryLight
-                    : COLORS.textSecondary
-                }
-              />
-              <Text
-                style={[
-                  styles.locationChipText,
-                  settings.locationEnabled && styles.locationChipTextActive,
-                ]}
-              >
-                {settings.locationEnabled ? '위치\n켜짐' : '위치\n꺼짐'}
-              </Text>
-            </Pressable>
-          </View>
+          {/* Location Toggle Space for layout balance */}
+          <View style={styles.sideControlWrapper} />
 
           {/* Capture Button */}
           <CaptureButton
@@ -242,31 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  locationChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  locationChipActive: {
-    backgroundColor: COLORS.primaryBg,
-    borderColor: 'rgba(59,130,246,0.5)',
-  },
-  locationChipText: {
-    fontSize: 10,
-    lineHeight: 12,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.55)',
-    textAlign: 'center',
-  },
-  locationChipTextActive: {
-    color: '#93C5FD',
-  },
+
   sideControlWrapper: {
     flex: 1,
     alignItems: 'flex-start',
