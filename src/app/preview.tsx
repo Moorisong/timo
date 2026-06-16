@@ -107,8 +107,11 @@ export default function PreviewScreen() {
     }
   }, [isSharing, captureComposedImage]);
 
+  const isLandscape = captureData ? captureData.width > captureData.height : false;
   const composerWidth = SCREEN_WIDTH;
-  const composerHeight = composerWidth * (4 / 3);
+  const composerHeight = isLandscape
+    ? composerWidth * (3 / 4)
+    : composerWidth * (4 / 3);
 
   return (
     <View style={styles.container}>

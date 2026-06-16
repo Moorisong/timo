@@ -4,17 +4,22 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
-import { CameraView } from 'expo-camera';
-import { useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { CAMERA_QUALITY } from '@/constants';
+
+interface PictureResult {
+  uri: string;
+  width: number;
+  height: number;
+}
 
 interface UseCameraReturn {
   cameraRef: React.RefObject<CameraView | null>;
   hasPermission: boolean | null;
   isCapturing: boolean;
   requestPermission: () => Promise<boolean>;
-  takePicture: () => Promise<string | null>;
+  takePicture: () => Promise<PictureResult | null>;
 }
 
 export default function useCamera(): UseCameraReturn {
@@ -33,15 +38,23 @@ export default function useCamera(): UseCameraReturn {
     }
   }, [requestCameraPermission]);
 
-  const takePicture = useCallback(async (): Promise<string | null> => {
+  const takePicture = useCallback(async (): Promise<PictureResult | null> => {
     if (!cameraRef.current || isCapturing) return null;
 
     try {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync({
         quality: CAMERA_QUALITY,
+        exif: true,
       });
-      return photo?.uri ?? null;
+      if (photo?.uri) {
+        return {
+          uri: photo.uri,
+          width: photo.width,
+          height: photo.height,
+        };
+      }
+      return null;
     } catch (error) {
       if (__DEV__) {
         console.error('촬영 실패:', error);

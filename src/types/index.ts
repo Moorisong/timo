@@ -23,6 +23,8 @@ export interface LocationData {
 /** 촬영 시 합성에 필요한 메타데이터 */
 export interface CaptureData {
   imageUri: string;
+  width: number;
+  height: number;
   timestamp: Date;
   settings: Settings;
   location: LocationData | null;

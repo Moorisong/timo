@@ -33,10 +33,12 @@ export default function CameraScreen() {
   }, []);
 
   const handleCapture = async () => {
-    const imageUri = await takePicture();
-    if (imageUri) {
+    const photo = await takePicture();
+    if (photo) {
       const captureData: CaptureData = {
-        imageUri,
+        imageUri: photo.uri,
+        width: photo.width,
+        height: photo.height,
         timestamp: new Date(),
         settings,
         location: gpsInfo.location,
@@ -50,10 +52,7 @@ export default function CameraScreen() {
     }
   };
 
-  const toggleLocation = () => {
-    // locationEnabled는 settings에서 관리되므로 로컬 토글만 사용
-    router.setParams({});
-  };
+
 
   return (
     <View style={styles.container}>
