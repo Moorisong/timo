@@ -1,20 +1,20 @@
-/**
- * useCamera 훅 단위 테스트
- */
 import { renderHook, act } from '@testing-library/react-native';
 import useCamera from '../use-camera';
 
 // CameraView Mocking
 const mockTakePictureAsync = jest.fn();
 jest.mock('expo-camera', () => {
-  const React = require('react');
+  /* eslint-disable-next-line @typescript-eslint/no-require-imports */
+  const ReactModule = require('react');
+  const MockCameraView = ReactModule.forwardRef((props: any, ref: any) => {
+    ReactModule.useImperativeHandle(ref, () => ({
+      takePictureAsync: mockTakePictureAsync,
+    }));
+    return null;
+  });
+  MockCameraView.displayName = 'CameraView';
   return {
-    CameraView: React.forwardRef((props: any, ref: any) => {
-      React.useImperativeHandle(ref, () => ({
-        takePictureAsync: mockTakePictureAsync,
-      }));
-      return null;
-    }),
+    CameraView: MockCameraView,
     useCameraPermissions: () => [{ granted: true }, jest.fn()],
   };
 });
