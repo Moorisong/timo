@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     right: 12,
   },
   timeBadge: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   metadataBg: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
     padding: 12,
   },
   metadataAgency: {
