@@ -12,7 +12,7 @@ export function formatTimestamp(date: Date): string {
   const h = String(date.getHours()).padStart(2, '0');
   const mi = String(date.getMinutes()).padStart(2, '0');
   const s = String(date.getSeconds()).padStart(2, '0');
-  return `${y}-${mo}-${d} ${h}:${mi}:${s}`;
+  return `${y}-${mo}-${d}\n${h}:${mi}:${s}`;
 }
 
 /**
