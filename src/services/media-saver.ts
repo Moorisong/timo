@@ -27,18 +27,32 @@ export function generateFileName(date: Date): string {
  */
 export async function requestMediaPermission(): Promise<boolean> {
   try {
-    // getPermissionsAsync에 writeOnly 옵션을 전달하여 AUDIO 권한 체크 예외를 우회합니다.
-    const existing = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
+    // 1. 먼저 일반 미디어 권한(읽기/쓰기 모두 포함)을 요청합니다.
+    const existing = await MediaLibrary.getPermissionsAsync();
     if (existing.granted) {
       return true;
     }
-    const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
+    const { status } = await MediaLibrary.requestPermissionsAsync();
     return status === 'granted';
   } catch (error) {
+    // 2. 일반 권한 요청이 실패하는 경우 (예: Expo Go / 시뮬레이터 한계)
+    // writeOnly: true로 폴백하여 최소한 에셋 저장은 가능하게 만듭니다.
     if (__DEV__) {
-      console.warn('미디어 권한 요청 불가 (시뮬레이터/Expo Go 제한):', error);
+      console.warn('일반 미디어 권한 요청 실패, writeOnly로 재시도합니다:', error);
     }
-    return false;
+    try {
+      const existingWrite = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
+      if (existingWrite.granted) {
+        return true;
+      }
+      const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
+      return status === 'granted';
+    } catch (writeOnlyError) {
+      if (__DEV__) {
+        console.warn('writeOnly 미디어 권한 요청도 불가합니다:', writeOnlyError);
+      }
+      return false;
+    }
   }
 }
 

@@ -31,7 +31,7 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith();
       expect(MediaLibrary.requestPermissionsAsync).not.toHaveBeenCalled();
     });
 
@@ -48,11 +48,32 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith();
+      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith();
+    });
+
+    it('일반 권한 요청 시 에러가 나면, writeOnly: true 옵션을 사용하여 권한 획득을 재시도해야 한다', async () => {
+      // 첫 번째 getPermissionsAsync 호출은 에러를 던져 폴백을 유도합니다.
+      (MediaLibrary.getPermissionsAsync as jest.Mock)
+        .mockRejectedValueOnce(new Error('Kotlin Type Conversion Error'))
+        .mockResolvedValueOnce({
+          granted: false,
+          status: 'undetermined',
+        });
+      
+      (MediaLibrary.requestPermissionsAsync as jest.Mock).mockResolvedValue({
+        granted: true,
+        status: 'granted',
+      });
+
+      const result = await requestMediaPermission();
+
+      expect(result).toBe(true);
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenLastCalledWith({ writeOnly: true });
       expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
     });
 
-    it('권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
+    it('모든 권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: false,
         status: 'undetermined',
