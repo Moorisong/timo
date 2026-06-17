@@ -17,6 +17,7 @@ interface UseLocationReturn {
   gpsInfo: GpsInfo;
   requestPermission: () => Promise<boolean>;
   refreshLocation: () => Promise<void>;
+  testMockGps: () => void;
 }
 
 export default function useLocation(enabled: boolean): UseLocationReturn {
@@ -137,7 +138,10 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
       return;
     }
 
-    let subscription: Location.LocationSubscription | null = null;
+    // 이전 위치 캐싱(좌표 비교용)
+    let lastLatitude: number | null = null;
+    let lastLongitude: number | null = null;
+    let lastAddress: string | null = null;
 
     const startWatching = async () => {
       const granted = await requestPermission();
@@ -145,6 +149,38 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
 
       setGpsStatus('GPS_SEARCHING');
 
+      // 1. 초기 1회 고속 위치 획득 (Balanced 수준으로 기지국/Wi-Fi 정보를 빠르게 조회)
+      try {
+        const current = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+
+        if (current.mocked) {
+          setGpsStatus('GPS_MOCKED');
+          setLocationData(null);
+          return;
+        }
+
+        const address = await reverseGeocode(
+          current.coords.latitude,
+          current.coords.longitude
+        );
+
+        lastLatitude = current.coords.latitude;
+        lastLongitude = current.coords.longitude;
+        lastAddress = address;
+
+        setLocationData({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+          address,
+        });
+        setGpsStatus('GPS_OK');
+      } catch {
+        // 첫 1회 조회가 실패하더라도 에러로 멈추지 않고 watchPositionAsync를 시도합니다.
+      }
+
+      // 2. 실시간 위치 변화 모니터링 시작
       try {
         subscription = await Location.watchPositionAsync(
           {
@@ -159,10 +195,24 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
               return;
             }
 
-            const address = await reverseGeocode(
-              loc.coords.latitude,
-              loc.coords.longitude
-            );
+            // 위도/경도 오차가 0.00001 (약 1m 이내) 이하이고 주소가 존재하면 API 호출 생략
+            let address = lastAddress;
+            const hasMoved =
+              lastLatitude === null ||
+              lastLongitude === null ||
+              Math.abs(loc.coords.latitude - lastLatitude) > 0.00001 ||
+              Math.abs(loc.coords.longitude - lastLongitude) > 0.00001;
+
+            if (hasMoved || !lastAddress) {
+              address = await reverseGeocode(
+                loc.coords.latitude,
+                loc.coords.longitude
+              );
+              lastLatitude = loc.coords.latitude;
+              lastLongitude = loc.coords.longitude;
+              lastAddress = address;
+            }
+
             setLocationData({
               latitude: loc.coords.latitude,
               longitude: loc.coords.longitude,
@@ -188,5 +238,10 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
     location: locationData,
   };
 
-  return { gpsInfo, requestPermission, refreshLocation };
+  const testMockGps = useCallback(() => {
+    setGpsStatus('GPS_MOCKED');
+    setLocationData(null);
+  }, []);
+
+  return { gpsInfo, requestPermission, refreshLocation, testMockGps };
 }

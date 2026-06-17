@@ -107,13 +107,21 @@ describe('useLocation Hook 테스트', () => {
       });
     });
 
-    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce({
-      coords: {
-        latitude: 37.5665,
-        longitude: 126.9780,
-      },
-      mocked: true, // 모의 위치 반환
-    });
+    // 마운트 시 1회 고속 수집은 정상 좌표, refreshLocation 시 2회째 수집은 모의 위치 반환하도록 순차적으로 모의
+    (Location.getCurrentPositionAsync as jest.Mock)
+      .mockResolvedValueOnce({
+        coords: {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        },
+      })
+      .mockResolvedValueOnce({
+        coords: {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        },
+        mocked: true, // 모의 위치 반환
+      });
 
     const { result } = renderHook(() => useLocation(true));
 
@@ -125,7 +133,7 @@ describe('useLocation Hook 테스트', () => {
       await result.current.refreshLocation();
     });
 
-    expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
+    expect(Location.getCurrentPositionAsync).toHaveBeenCalledTimes(2);
     expect(result.current.gpsInfo.status).toBe('GPS_MOCKED');
     expect(result.current.gpsInfo.location).toBeNull();
   });
