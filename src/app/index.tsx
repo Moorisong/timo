@@ -14,7 +14,7 @@ import { COLORS, WATERMARK_TEXT } from '@/constants';
 import useCamera from '@/hooks/use-camera';
 import useLocation from '@/hooks/use-location';
 import useSettings from '@/hooks/use-settings';
-import { CameraPreview, CaptureButton } from '@/components/camera';
+import { CameraPreview, CaptureButton, GpsStatusBar } from '@/components/camera';
 import { formatTimestamp } from '@/utils/format-date';
 
 import type { CaptureData } from '@/types';
@@ -31,7 +31,7 @@ export default function CameraScreen() {
   );
   const { cameraRef, hasPermission, isCapturing, requestPermission, takePicture } =
     useCamera();
-  const { gpsInfo } = useLocation(settings.locationEnabled);
+  const { gpsInfo, testMockGps } = useLocation(settings.locationEnabled);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -101,7 +101,21 @@ export default function CameraScreen() {
       <SafeAreaView edges={['bottom']} style={styles.bottomControls}>
         <View style={styles.controlsRow}>
           {/* Location Toggle Space for layout balance */}
-          <View style={styles.sideControlWrapper} />
+          <View style={styles.sideControlWrapper}>
+            {settings.locationEnabled && (
+              <>
+                <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
+                {__DEV__ && (
+                  <Pressable
+                    onPress={testMockGps}
+                    style={{ marginTop: 8, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: 'rgba(255,50,50,0.8)', borderRadius: 4, alignSelf: 'flex-start' }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>MOCK 테스트</Text>
+                  </Pressable>
+                )}
+              </>
+            )}
+          </View>
 
           {/* Capture Button */}
           <CaptureButton
