@@ -10,7 +10,7 @@
 
     "android": {
       "package": "com.timo.android",
-      "versionCode": 9,
+      "versionCode": 10,
       "adaptiveIcon": {
         "backgroundColor": "#208AEF",
         "foregroundImage": "./assets/images/android-icon-foreground-white.png"
@@ -74,6 +74,19 @@
           "photosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 접근이 필요합니다.",
           "savePhotosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 저장 권한이 필요합니다.",
           "saveAudioPermission": "촬영된 사진을 갤러리에 저장하기 위해 오디오 권한이 필요합니다."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraParams": {
+              "org.gradle.jvmargs": "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC",
+              "org.gradle.caching": "true",
+              "org.gradle.parallel": "true",
+              "org.gradle.configureondemand": "true"
+            }
+          }
         }
       ]
     ],

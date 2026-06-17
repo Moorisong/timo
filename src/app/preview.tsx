@@ -34,7 +34,9 @@ export default function PreviewScreen() {
   const params = useLocalSearchParams<{ captureData?: string }>();
   const viewShotRef = useRef<ViewShot>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
   const [isSharing, setIsSharing] = useState(false);
+  const isSharingRef = useRef(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -71,7 +73,8 @@ export default function PreviewScreen() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (isSaving) return;
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
     setIsSaving(true);
     try {
       const composedUri = await captureComposedImage();
@@ -91,12 +94,14 @@ export default function PreviewScreen() {
     } catch {
       showToast('저장 중 오류가 발생했습니다.');
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
     }
-  }, [isSaving, captureComposedImage, router, showToast]);
+  }, [captureComposedImage, router, showToast]);
 
   const handleShare = useCallback(async () => {
-    if (isSharing) return;
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
     setIsSharing(true);
     try {
       const composedUri = await captureComposedImage();
@@ -113,9 +118,10 @@ export default function PreviewScreen() {
     } catch {
       showToast('공유 중 오류가 발생했습니다.');
     } finally {
+      isSharingRef.current = false;
       setIsSharing(false);
     }
-  }, [isSharing, captureComposedImage, showToast]);
+  }, [captureComposedImage, showToast]);
 
   const isLandscape = captureData ? captureData.width > captureData.height : false;
   const imageAspectRatio = captureData && captureData.height > 0

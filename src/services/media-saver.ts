@@ -78,9 +78,9 @@ export async function saveImageToGallery(uri: string): Promise<boolean> {
       try {
         let album = await MediaLibrary.getAlbumAsync(SAVE_ALBUM_NAME);
         if (album === null) {
-          await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, true);
+          await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, false);
         } else {
-          await MediaLibrary.addAssetsToAlbumAsync([asset], album, true);
+          await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
         }
       } catch (albumError) {
         if (__DEV__) {

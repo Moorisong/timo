@@ -106,7 +106,7 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).not.toHaveBeenCalled();
     });
 
-    it('권한이 있고 Timo 앨범이 존재하지 않는 경우, 수정 허용 팝업(RecoverableSecurityException) 방지를 위해 copyAsset을 true로 설정하여 앨범을 생성해야 한다', async () => {
+    it('권한이 있고 Timo 앨범이 존재하지 않는 경우, copyAsset을 false로 설정하여 자산을 이동시켜 앨범을 생성해야 한다', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: true,
         status: 'granted',
@@ -121,10 +121,10 @@ describe('media-saver 서비스 테스트', () => {
       expect(result).toBe(true);
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
-      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, true);
+      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, false);
     });
 
-    it('권한이 있고 Timo 앨범이 이미 존재하는 경우, 수정 허용 팝업(RecoverableSecurityException) 방지를 위해 copyAsset을 true로 설정하여 기존 앨범에 자산을 추가해야 한다', async () => {
+    it('권한이 있고 Timo 앨범이 이미 존재하는 경우, copyAsset을 false로 설정하여 자산을 이동시켜 기존 앨범에 자산을 추가해야 한다', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: true,
         status: 'granted',
@@ -140,7 +140,7 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
       expect(MediaLibrary.createAlbumAsync).not.toHaveBeenCalled();
-      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, true);
+      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, false);
     });
   });
 });
