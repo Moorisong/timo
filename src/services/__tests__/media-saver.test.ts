@@ -48,6 +48,38 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith(true);
     });
 
+    it('시나리오: 권한이 허용된 이후 두 번째 저장 시도부터는 권한 허용 창(requestPermissionsAsync)이 절대 뜨지 않아야 한다', async () => {
+      // 1. 최초 상태: 권한 없음
+      (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+        granted: false,
+        status: 'undetermined',
+      });
+      // 최초 권한 요청 시 허용됨
+      (MediaLibrary.requestPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+        granted: true,
+        status: 'granted',
+      });
+
+      // 최초 시도
+      const firstResult = await requestMediaPermission();
+      expect(firstResult).toBe(true);
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledTimes(1);
+      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledTimes(1); // 창 1회 노출
+
+      // 2. 두 번째 상태: 이제 권한 있음
+      (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+        granted: true,
+        status: 'granted',
+      });
+
+      // 두 번째 시도
+      const secondResult = await requestMediaPermission();
+      expect(secondResult).toBe(true);
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledTimes(2);
+      // requestPermissionsAsync는 더 이상 호출되지 않아야 함 (여전히 1회 노출 상태 유지)
+      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledTimes(1);
+    });
+
     it('권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: false,
