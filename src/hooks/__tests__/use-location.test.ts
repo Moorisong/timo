@@ -75,4 +75,58 @@ describe('useLocation Hook 테스트', () => {
     expect(result.current.gpsInfo.status).toBe('GPS_OK');
     expect(result.current.gpsInfo.location?.address).toBe('서울특별시 마포구 아현동 마포대로 123 마포빌딩');
   });
+
+  it('가짜 GPS 앱(모의 위치) 사용 시 watchPositionAsync에서 조작된 위치로 감지되어야 한다', async () => {
+    (Location.watchPositionAsync as jest.Mock).mockImplementationOnce((options, callback) => {
+      callback({
+        coords: {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        },
+        mocked: true, // 모의 위치 반환
+      });
+      return Promise.resolve({
+        remove: jest.fn(),
+      });
+    });
+
+    const { result } = renderHook(() => useLocation(true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(result.current.gpsInfo.status).toBe('GPS_MOCKED');
+    expect(result.current.gpsInfo.location).toBeNull();
+  });
+
+  it('가짜 GPS 앱(모의 위치) 사용 시 refreshLocation에서 조작된 위치로 감지되어야 한다', async () => {
+    (Location.watchPositionAsync as jest.Mock).mockImplementationOnce(() => {
+      return Promise.resolve({
+        remove: jest.fn(),
+      });
+    });
+
+    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce({
+      coords: {
+        latitude: 37.5665,
+        longitude: 126.9780,
+      },
+      mocked: true, // 모의 위치 반환
+    });
+
+    const { result } = renderHook(() => useLocation(true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    await act(async () => {
+      await result.current.refreshLocation();
+    });
+
+    expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
+    expect(result.current.gpsInfo.status).toBe('GPS_MOCKED');
+    expect(result.current.gpsInfo.location).toBeNull();
+  });
 });

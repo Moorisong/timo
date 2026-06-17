@@ -108,6 +108,13 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
       const current = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
+
+      if (current.mocked) {
+        setGpsStatus('GPS_MOCKED');
+        setLocationData(null);
+        return;
+      }
+
       const address = await reverseGeocode(
         current.coords.latitude,
         current.coords.longitude
@@ -146,6 +153,12 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
             distanceInterval: LOCATION_DISTANCE_FILTER_M,
           },
           async (loc) => {
+            if (loc.mocked) {
+              setGpsStatus('GPS_MOCKED');
+              setLocationData(null);
+              return;
+            }
+
             const address = await reverseGeocode(
               loc.coords.latitude,
               loc.coords.longitude

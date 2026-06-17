@@ -3,7 +3,7 @@
  */
 
 /** GPS 상태 정의 */
-export type GpsStatus = 'GPS_OK' | 'GPS_SEARCHING' | 'GPS_OFF' | 'GPS_ERROR';
+export type GpsStatus = 'GPS_OK' | 'GPS_SEARCHING' | 'GPS_OFF' | 'GPS_ERROR' | 'GPS_MOCKED';
 
 /** 사용자 설정 */
 export interface Settings {

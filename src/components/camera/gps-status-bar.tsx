@@ -21,6 +21,7 @@ const GPS_STATUS_LABELS: Record<string, string> = {
   GPS_SEARCHING: 'GPS 탐색중',
   GPS_OFF: 'GPS 꺼짐',
   GPS_ERROR: 'GPS 오류',
+  GPS_MOCKED: '조작된 위치',
 };
 
 export default function GpsStatusBar({
