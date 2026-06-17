@@ -44,7 +44,13 @@ export default function GpsStatusBar({
         {locationEnabled ? addressText : '위치 꺼짐'}
       </Text>
       <Text style={styles.dot}>·</Text>
-      <Text style={[styles.gpsText, isActive && styles.gpsTextActive]}>
+      <Text
+        style={[
+          styles.gpsText,
+          isActive && styles.gpsTextActive,
+          gpsInfo.status === 'GPS_MOCKED' && styles.gpsTextMocked,
+        ]}
+      >
         {statusLabel}
       </Text>
     </View>
@@ -75,5 +81,8 @@ const styles = StyleSheet.create({
   },
   gpsTextActive: {
     color: COLORS.primaryLight,
+  },
+  gpsTextMocked: {
+    color: '#FF4444',
   },
 });
