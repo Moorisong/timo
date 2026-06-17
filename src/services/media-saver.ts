@@ -27,11 +27,11 @@ export function generateFileName(date: Date): string {
  */
 export async function requestMediaPermission(): Promise<boolean> {
   try {
-    const existing = await MediaLibrary.getPermissionsAsync({ writeOnly: true } as any);
+    const existing = await MediaLibrary.getPermissionsAsync(true);
     if (existing.granted) {
       return true;
     }
-    const { status } = await MediaLibrary.requestPermissionsAsync({ writeOnly: true } as any);
+    const { status } = await MediaLibrary.requestPermissionsAsync(true);
     return status === 'granted';
   } catch (error) {
     if (__DEV__) {

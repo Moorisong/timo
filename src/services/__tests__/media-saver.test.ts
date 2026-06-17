@@ -27,7 +27,7 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith(true);
       expect(MediaLibrary.requestPermissionsAsync).not.toHaveBeenCalled();
     });
 
@@ -44,8 +44,8 @@ describe('media-saver 서비스 테스트', () => {
       const result = await requestMediaPermission();
 
       expect(result).toBe(true);
-      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
-      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith({ writeOnly: true });
+      expect(MediaLibrary.getPermissionsAsync).toHaveBeenCalledWith(true);
+      expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith(true);
     });
 
     it('권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
