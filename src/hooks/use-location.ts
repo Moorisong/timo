@@ -142,6 +142,7 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
     let lastLatitude: number | null = null;
     let lastLongitude: number | null = null;
     let lastAddress: string | null = null;
+    let subscription: Location.LocationSubscription | null = null;
 
     const startWatching = async () => {
       const granted = await requestPermission();

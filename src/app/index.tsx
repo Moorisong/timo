@@ -99,23 +99,24 @@ export default function CameraScreen() {
 
       {/* Bottom Controls */}
       <SafeAreaView edges={['bottom']} style={styles.bottomControls}>
-        <View style={styles.controlsRow}>
-          {/* Location Toggle Space for layout balance */}
-          <View style={styles.sideControlWrapper}>
-            {settings.locationEnabled && (
-              <>
-                <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
-                {__DEV__ && (
-                  <Pressable
-                    onPress={testMockGps}
-                    style={{ marginTop: 8, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: 'rgba(255,50,50,0.8)', borderRadius: 4, alignSelf: 'flex-start' }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>MOCK 테스트</Text>
-                  </Pressable>
-                )}
-              </>
+        {/* GPS 상태바를 하단 컨트롤들과 겹치지 않게 촬영 버튼의 상단 영역에 독립 배치 */}
+        {settings.locationEnabled && (
+          <View style={styles.gpsStatusContainer}>
+            <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
+            {__DEV__ && (
+              <Pressable
+                onPress={testMockGps}
+                style={styles.mockTestButton}
+              >
+                <Text style={styles.mockTestButtonText}>MOCK 테스트</Text>
+              </Pressable>
             )}
           </View>
+        )}
+
+        <View style={styles.controlsRow}>
+          {/* Layout balance spacer */}
+          <View style={styles.sideControlWrapper} />
 
           {/* Capture Button */}
           <CaptureButton
@@ -220,6 +221,24 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     paddingTop: 24,
     zIndex: 10,
+  },
+  gpsStatusContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  mockTestButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,50,50,0.8)',
+    borderRadius: 4,
+  },
+  mockTestButtonText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   controlsRow: {
     flexDirection: 'row',
