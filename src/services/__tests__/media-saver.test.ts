@@ -106,7 +106,7 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).not.toHaveBeenCalled();
     });
 
-    it('권한이 있고 Timo 앨범이 존재하지 않는 경우, copyAsset을 false로 설정하여 자산을 이동시켜 앨범을 생성해야 한다', async () => {
+    it('권한이 있고 Timo 앨범이 존재하지 않는 경우, copyAsset을 true로 설정하여 자산을 복사하여 앨범을 생성해야 한다 (Android Scoped Storage 팝업 우회)', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: true,
         status: 'granted',
@@ -121,10 +121,10 @@ describe('media-saver 서비스 테스트', () => {
       expect(result).toBe(true);
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
-      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, false);
+      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, true);
     });
 
-    it('권한이 있고 Timo 앨범이 이미 존재하는 경우, copyAsset을 false로 설정하여 자산을 이동시켜 기존 앨범에 자산을 추가해야 한다', async () => {
+    it('권한이 있고 Timo 앨범이 이미 존재하는 경우, copyAsset을 true로 설정하여 자산을 복사하여 기존 앨범에 자산을 추가해야 한다 (Android Scoped Storage 팝업 우회)', async () => {
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: true,
         status: 'granted',
@@ -140,7 +140,15 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
       expect(MediaLibrary.createAlbumAsync).not.toHaveBeenCalled();
-      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, false);
+      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, true);
+    });
+
+    it('코드 내에 iOS 관련 분기 처리(Platform.OS === "ios" 등)가 포함되지 않아야 한다 (Android 전용 앱 보장)', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const sourceCode = fs.readFileSync(path.resolve(__dirname, '../media-saver.ts'), 'utf-8');
+      expect(sourceCode.toLowerCase()).not.toContain('ios');
+      expect(sourceCode).not.toContain('Platform.OS');
     });
   });
 });

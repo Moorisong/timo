@@ -10,7 +10,7 @@
 
     "android": {
       "package": "com.timo.android",
-      "versionCode": 10,
+      "versionCode": 11,
       "adaptiveIcon": {
         "backgroundColor": "#208AEF",
         "foregroundImage": "./assets/images/android-icon-foreground-white.png"
