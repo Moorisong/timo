@@ -10,7 +10,7 @@
 
     "android": {
       "package": "com.timo.android",
-      "versionCode": 11,
+      "versionCode": 12,
       "adaptiveIcon": {
         "backgroundColor": "#208AEF",
         "foregroundImage": "./assets/images/android-icon-foreground-white.png"
@@ -84,7 +84,9 @@
               "org.gradle.jvmargs": "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC",
               "org.gradle.caching": "true",
               "org.gradle.parallel": "true",
-              "org.gradle.configureondemand": "true"
+              "org.gradle.configureondemand": "true",
+              "org.gradle.daemon": "true",
+              "org.gradle.vfs.watch": "true"
             }
           }
         }
