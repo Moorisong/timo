@@ -139,7 +139,7 @@ describe('useLocation Hook 테스트', () => {
     expect(result.current.gpsInfo.location).toBeNull();
   });
 
-  it('초기 마운트 시 getCurrentPositionAsync를 Accuracy.Low 설정으로 즉각적인 초기 위치 1회 조회를 선행해야 한다', async () => {
+  it('초기 마운트 시 getCurrentPositionAsync를 Accuracy.Balanced 설정으로 즉각적인 초기 위치 1회 조회를 선행해야 한다', async () => {
     renderHook(() => useLocation(true));
 
     await act(async () => {
@@ -147,7 +147,7 @@ describe('useLocation Hook 테스트', () => {
     });
 
     expect(Location.getCurrentPositionAsync).toHaveBeenCalledWith(
-      expect.objectContaining({ accuracy: Location.Accuracy.Low })
+      expect.objectContaining({ accuracy: Location.Accuracy.Balanced })
     );
   });
 

@@ -122,7 +122,7 @@ describe('media-saver 서비스 테스트', () => {
       expect(result).toBe(true);
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
-      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, true);
+      expect(MediaLibrary.createAlbumAsync).toHaveBeenCalledWith('Timo', mockAsset, false);
     });
 
     it('권한이 있고 Timo 앨범이 이미 존재하는 경우, 앨범을 생성하지 않고 기존 앨범에 자산을 추가해야 한다', async () => {
@@ -141,7 +141,7 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.createAssetAsync).toHaveBeenCalledWith('file://test.jpg');
       expect(MediaLibrary.getAlbumAsync).toHaveBeenCalledWith('Timo');
       expect(MediaLibrary.createAlbumAsync).not.toHaveBeenCalled();
-      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, true);
+      expect(MediaLibrary.addAssetsToAlbumAsync).toHaveBeenCalledWith([mockAsset], mockAlbum, false);
     });
   });
 });

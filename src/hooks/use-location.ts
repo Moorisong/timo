@@ -107,7 +107,7 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
     try {
       setGpsStatus('GPS_SEARCHING');
       const current = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Location.Accuracy.High,
       });
 
       if (current.mocked) {
@@ -154,7 +154,7 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
       try {
         const getFastPosition = Promise.race([
           Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Low,
+            accuracy: Location.Accuracy.Balanced,
           }),
           new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Location fetch timeout')), 2000)
@@ -192,7 +192,7 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
       try {
         subscription = await Location.watchPositionAsync(
           {
-            accuracy: Location.Accuracy.Balanced,
+            accuracy: Location.Accuracy.High,
             timeInterval: LOCATION_UPDATE_INTERVAL_MS,
             distanceInterval: LOCATION_DISTANCE_FILTER_M,
           },
