@@ -65,9 +65,11 @@ export async function saveImageToGallery(uri: string): Promise<boolean> {
   try {
     // 1. 먼저 권한 체크 및 요청을 시도합니다.
     const granted = await requestMediaPermission();
+    if (!granted) {
+      return false;
+    }
     
-    // 2. 권한 획득 여부와 관계없이, createAssetAsync를 직접 실행하여 네이티브에서 필요한 경우 권한 창이 뜨도록 유도합니다.
-    // getPermissionsAsync에서 CodedError를 뱉더라도 실제 이미지를 저장하는 시점에 시스템이 권한 팝업을 띄워줄 수 있습니다.
+    // 2. 권한이 확보된 경우에만 미디어 라이브러리에 에셋을 생성합니다.
     const asset = await MediaLibrary.createAssetAsync(uri);
 
     // 3. 사용자가 기본 카메라 앨범에 저장을 요청했으므로, 앨범명을 'Camera'로 설정했을 경우
@@ -76,13 +78,13 @@ export async function saveImageToGallery(uri: string): Promise<boolean> {
       try {
         let album = await MediaLibrary.getAlbumAsync(SAVE_ALBUM_NAME);
         if (album === null) {
-          await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, false);
+          await MediaLibrary.createAlbumAsync(SAVE_ALBUM_NAME, asset, true);
         } else {
-          await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+          await MediaLibrary.addAssetsToAlbumAsync([asset], album, true);
         }
       } catch (albumError) {
         if (__DEV__) {
-          console.warn('Timo 앨범 저장/이동 생략 (Expo Go 미지원 권한 우회):', albumError);
+          console.warn('Timo 앨범 저장/이동 중 에러 발생:', albumError);
         }
       }
     }

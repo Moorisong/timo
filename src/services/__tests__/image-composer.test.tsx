@@ -62,3 +62,43 @@ describe('고해상도 스케일 팩터 스타일 연산 검증', () => {
     expect(scaledFontSize).toBe(32.5);
   });
 });
+
+describe('사진 종횡비(Aspect Ratio) 기반 크기 계산 테스트', () => {
+  const calculateSizes = (width: number, height: number, screenWidth: number, targetWidth: number) => {
+    const isLandscape = width > height;
+    const imageAspectRatio = height > 0 ? width / height : (isLandscape ? 4 / 3 : 3 / 4);
+    const composerHeight = screenWidth / imageAspectRatio;
+    const captureHeight = targetWidth / imageAspectRatio;
+    return { imageAspectRatio, composerHeight, captureHeight };
+  };
+
+  it('세로로 길쭉한 9:16 비율의 이미지 크기가 잘림 없이 올바르게 계산되어야 한다', () => {
+    const screenWidth = 360;
+    const targetWidth = 1920;
+    const result = calculateSizes(1080, 1920, screenWidth, targetWidth);
+    
+    expect(result.imageAspectRatio).toBe(9 / 16);
+    expect(result.composerHeight).toBeCloseTo(360 * (16 / 9));
+    expect(result.captureHeight).toBeCloseTo(1920 * (16 / 9));
+  });
+
+  it('3:4 비율의 일반 세로 사진 크기가 올바르게 계산되어야 한다', () => {
+    const screenWidth = 360;
+    const targetWidth = 1920;
+    const result = calculateSizes(3000, 4000, screenWidth, targetWidth);
+    
+    expect(result.imageAspectRatio).toBe(3 / 4);
+    expect(result.composerHeight).toBe(360 * (4 / 3));
+    expect(result.captureHeight).toBe(1920 * (4 / 3));
+  });
+
+  it('가로로 길쭉한 16:9 비율의 이미지 크기가 올바르게 계산되어야 한다', () => {
+    const screenWidth = 360;
+    const targetWidth = 1920;
+    const result = calculateSizes(1920, 1080, screenWidth, targetWidth);
+    
+    expect(result.imageAspectRatio).toBe(16 / 9);
+    expect(result.composerHeight).toBeCloseTo(360 * (9 / 16));
+    expect(result.captureHeight).toBeCloseTo(1920 * (9 / 16));
+  });
+});

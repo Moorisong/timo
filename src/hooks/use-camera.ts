@@ -48,10 +48,15 @@ export default function useCamera(): UseCameraReturn {
         exif: true,
       });
       if (photo?.uri) {
+        const orientation = photo.exif?.Orientation ?? photo.exif?.orientation;
+        const isRotated = orientation === 5 || orientation === '5' ||
+                          orientation === 6 || orientation === '6' ||
+                          orientation === 7 || orientation === '7' ||
+                          orientation === 8 || orientation === '8';
         return {
           uri: photo.uri,
-          width: photo.width,
-          height: photo.height,
+          width: isRotated ? photo.height : photo.width,
+          height: isRotated ? photo.width : photo.height,
         };
       }
       return null;
