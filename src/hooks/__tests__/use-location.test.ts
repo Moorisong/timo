@@ -137,4 +137,50 @@ describe('useLocation Hook 테스트', () => {
     expect(result.current.gpsInfo.status).toBe('GPS_MOCKED');
     expect(result.current.gpsInfo.location).toBeNull();
   });
+
+  it('초기 마운트 시 getCurrentPositionAsync를 통해 즉각적인 초기 위치 1회 조회를 선행해야 한다', async () => {
+    renderHook(() => useLocation(true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
+  });
+
+  it('위치 좌표 변화가 거의 없을 경우(1m 이내) reverseGeocodeAsync 호출을 건너뛰고 기존 주소를 재사용해야 한다', async () => {
+    let watchCallback: ((loc: any) => void) | null = null;
+    (Location.watchPositionAsync as jest.Mock).mockImplementationOnce((options, callback) => {
+      watchCallback = callback;
+      return Promise.resolve({
+        remove: jest.fn(),
+      });
+    });
+
+    const { result } = renderHook(() => useLocation(true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // reverseGeocodeAsync의 mock 초기 호출 회수 기록
+    const initialGeocodeCalls = (Location.reverseGeocodeAsync as jest.Mock).mock.calls.length;
+
+    // 미미한 위치 변화 발생 (약 1m 이내: 0.000005 변화)
+    await act(async () => {
+      if (watchCallback) {
+        (watchCallback as (loc: any) => void)({
+          coords: {
+            latitude: 37.5665 + 0.000005,
+            longitude: 126.9780 + 0.000005,
+          },
+        });
+      }
+    });
+
+    // 주소 변환 API가 추가로 호출되지 않았어야 함
+    expect((Location.reverseGeocodeAsync as jest.Mock).mock.calls.length).toBe(initialGeocodeCalls);
+    // 기존 주소를 잘 활용하여 상태 유지
+    expect(result.current.gpsInfo.location?.address).toBe('서울특별시 마포구 아현동 마포대로 123 마포빌딩');
+  });
 });
