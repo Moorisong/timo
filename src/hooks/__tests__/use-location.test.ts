@@ -139,14 +139,16 @@ describe('useLocation Hook 테스트', () => {
     expect(result.current.gpsInfo.location).toBeNull();
   });
 
-  it('초기 마운트 시 getCurrentPositionAsync를 통해 즉각적인 초기 위치 1회 조회를 선행해야 한다', async () => {
+  it('초기 마운트 시 getCurrentPositionAsync를 Accuracy.Low 설정으로 즉각적인 초기 위치 1회 조회를 선행해야 한다', async () => {
     renderHook(() => useLocation(true));
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
+    expect(Location.getCurrentPositionAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ accuracy: Location.Accuracy.Low })
+    );
   });
 
   it('위치 좌표 변화가 거의 없을 경우(1m 이내) reverseGeocodeAsync 호출을 건너뛰고 기존 주소를 재사용해야 한다', async () => {
