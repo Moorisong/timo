@@ -38,6 +38,7 @@ jest.mock('expo-location', () => ({
   ]),
   Accuracy: {
     Balanced: 3,
+    Low: 2,
   },
 }));
 
@@ -202,5 +203,36 @@ describe('useLocation Hook 테스트', () => {
     unmount();
 
     expect(mockRemove).toHaveBeenCalled();
+  });
+
+  it('초기 위치 수집(getCurrentPositionAsync)이 2초 이상 지연되어 타임아웃이 발생해도, watchPositionAsync를 통해 정상 복구 및 수집을 진행해야 한다', async () => {
+    // getCurrentPositionAsync가 3초 이상 늦게 응답하도록 설정 (2초 타임아웃 유발)
+    (Location.getCurrentPositionAsync as jest.Mock).mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(() => resolve({ coords: { latitude: 37.5665, longitude: 126.9780 } }), 3000))
+    );
+
+    // watchPositionAsync는 정상적으로 즉시 갱신 좌표 콜백 실행하도록 설정
+    (Location.watchPositionAsync as jest.Mock).mockImplementationOnce((options, callback) => {
+      callback({
+        coords: {
+          latitude: 37.5665,
+          longitude: 126.9780,
+        },
+      });
+      return Promise.resolve({
+        remove: jest.fn(),
+      });
+    });
+
+    const { result } = renderHook(() => useLocation(true));
+
+    // 2초 타임아웃 대기 및 watchPositionAsync 실행 완료를 위한 대기
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2100));
+    });
+
+    // 타임아웃이 났음에도 watchPositionAsync가 정상 가동되어 최종적으로 위치 정보를 제대로 획득했어야 함
+    expect(result.current.gpsInfo.status).toBe('GPS_OK');
+    expect(result.current.gpsInfo.location?.address).toBe('서울특별시 마포구 아현동 마포대로 123 마포빌딩');
   });
 });

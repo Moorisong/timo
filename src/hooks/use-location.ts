@@ -150,11 +150,18 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
 
       setGpsStatus('GPS_SEARCHING');
 
-      // 1. 초기 1회 고속 위치 획득 (Balanced 수준으로 기지국/Wi-Fi 정보를 빠르게 조회)
+      // 1. 초기 1회 고속 위치 획득 (Low 수준으로 기지국/Wi-Fi 정보를 신속하게 조회하고 2초 타임아웃 제한)
       try {
-        const current = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
+        const getFastPosition = Promise.race([
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Location fetch timeout')), 2000)
+          ),
+        ]);
+
+        const current = await getFastPosition;
 
         if (current.mocked) {
           setGpsStatus('GPS_MOCKED');
@@ -178,7 +185,7 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
         });
         setGpsStatus('GPS_OK');
       } catch {
-        // 첫 1회 조회가 실패하더라도 에러로 멈추지 않고 watchPositionAsync를 시도합니다.
+        // 2초 내에 즉시 위치 획득이 안 되거나 에러가 나면 watchPositionAsync 단계에서 가져오도록 유도합니다.
       }
 
       // 2. 실시간 위치 변화 모니터링 시작
