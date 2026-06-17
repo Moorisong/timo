@@ -80,7 +80,11 @@ describe('media-saver 서비스 테스트', () => {
       expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledTimes(1);
     });
 
-    it('권한 요청이 거부된 경우 false를 반환해야 한다', async () => {
+    it('시나리오: 권한 요청이 거부되고 다시 묻지 않기가 활성화된 경우(canAskAgain: false) Alert 팝업을 띄우고 false를 반환해야 한다', async () => {
+      const { Alert, Linking } = require('react-native');
+      jest.spyOn(Alert, 'alert');
+      jest.spyOn(Linking, 'openSettings');
+
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: false,
         status: 'undetermined',
@@ -88,11 +92,47 @@ describe('media-saver 서비스 테스트', () => {
       (MediaLibrary.requestPermissionsAsync as jest.Mock).mockResolvedValue({
         granted: false,
         status: 'denied',
+        canAskAgain: false,
       });
 
       const result = await requestMediaPermission();
 
       expect(result).toBe(false);
+      expect(Alert.alert).toHaveBeenCalledWith(
+        '권한 확인',
+        '사진을 저장하려면 갤러리 쓰기 권한이 필요합니다. 기기의 설정에서 권한을 허용해주세요.',
+        expect.any(Array)
+      );
+      
+      // Alert의 '설정으로 이동' 버튼 시뮬레이션
+      const buttons = (Alert.alert as jest.Mock).mock.calls[0][2];
+      const settingsButton = buttons.find((b: any) => b.text === '설정으로 이동');
+      settingsButton.onPress();
+      expect(Linking.openSettings).toHaveBeenCalled();
+
+      jest.restoreAllMocks();
+    });
+
+    it('시나리오: 권한 요청이 단순 거부된 경우(canAskAgain: true) Alert를 띄우지 않고 false를 반환해야 한다', async () => {
+      const { Alert } = require('react-native');
+      jest.spyOn(Alert, 'alert');
+
+      (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
+        granted: false,
+        status: 'undetermined',
+      });
+      (MediaLibrary.requestPermissionsAsync as jest.Mock).mockResolvedValue({
+        granted: false,
+        status: 'denied',
+        canAskAgain: true,
+      });
+
+      const result = await requestMediaPermission();
+
+      expect(result).toBe(false);
+      expect(Alert.alert).not.toHaveBeenCalled();
+
+      jest.restoreAllMocks();
     });
   });
 
