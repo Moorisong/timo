@@ -183,4 +183,24 @@ describe('useLocation Hook 테스트', () => {
     // 기존 주소를 잘 활용하여 상태 유지
     expect(result.current.gpsInfo.location?.address).toBe('서울특별시 마포구 아현동 마포대로 123 마포빌딩');
   });
+
+  it('훅이 언마운트되면 watchPositionAsync의 subscription.remove()가 정상적으로 호출되어 메모리가 정리되어야 한다', async () => {
+    const mockRemove = jest.fn();
+    (Location.watchPositionAsync as jest.Mock).mockImplementationOnce(() => {
+      return Promise.resolve({
+        remove: mockRemove,
+      });
+    });
+
+    const { unmount } = renderHook(() => useLocation(true));
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // 언마운트 수행
+    unmount();
+
+    expect(mockRemove).toHaveBeenCalled();
+  });
 });

@@ -102,7 +102,6 @@ export default function CameraScreen() {
         {/* GPS 상태바를 하단 컨트롤들과 겹치지 않게 촬영 버튼의 상단 영역에 독립 배치 */}
         {settings.locationEnabled && (
           <View style={styles.gpsStatusContainer}>
-            <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
             {__DEV__ && (
               <Pressable
                 onPress={testMockGps}
@@ -111,6 +110,7 @@ export default function CameraScreen() {
                 <Text style={styles.mockTestButtonText}>MOCK 테스트</Text>
               </Pressable>
             )}
+            <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
           </View>
         )}
 
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 8,
+    flexDirection: 'column',
+    gap: 6,
   },
   mockTestButton: {
     paddingHorizontal: 8,
