@@ -5,24 +5,25 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Settings } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { COLORS, WATERMARK_TEXT } from '@/constants';
+import { CameraPreview, CaptureButton, GpsStatusBar } from '@/components/camera';
 import useCamera from '@/hooks/use-camera';
 import useLocation from '@/hooks/use-location';
 import useSettings from '@/hooks/use-settings';
-import { CameraPreview, CaptureButton, GpsStatusBar } from '@/components/camera';
 import { formatTimestamp } from '@/utils/format-date';
 
 import type { CaptureData } from '@/types';
 
+import { COLORS, WATERMARK_TEXT } from '@/constants';
+
 export default function CameraScreen() {
   const router = useRouter();
   const [now, setNow] = useState(new Date());
-  const { settings, updateField, loadSettings } = useSettings();
+  const { settings, loadSettings } = useSettings();
 
   useFocusEffect(
     useCallback(() => {
