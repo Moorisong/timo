@@ -62,12 +62,14 @@ export default function CameraPreview({
     );
   }
 
-  // 정상 카메라 프리뷰
+  // 정상 카메라 프리뷰 (깜빡임 애니메이션 및 플래시 제거)
   return (
     <CameraView
       ref={cameraRef}
       style={styles.camera}
       facing="back"
+      animateShutter={false}
+      flash="off"
     />
   );
 }

@@ -94,7 +94,7 @@ export default function ComposerOverlay({
                   paddingVertical: 6 * scale,
                   borderRadius: 8 * scale,
                   borderWidth: settings.metadataBackgroundEnabled ? 1 * scale : 0,
-                  backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.25)' : 'transparent',
+                  backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.5)' : 'transparent',
                 },
               ]}
             >
@@ -139,7 +139,7 @@ export default function ComposerOverlay({
               styles.metadataBg,
               {
                 padding: 12 * scale,
-                backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.35)' : 'transparent',
+                backgroundColor: settings.metadataBackgroundEnabled ? 'rgba(0,0,0,0.6)' : 'transparent',
               },
             ]}
           >

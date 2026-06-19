@@ -17,6 +17,7 @@ interface UseLocationReturn {
   gpsInfo: GpsInfo;
   requestPermission: () => Promise<boolean>;
   refreshLocation: () => Promise<void>;
+  testMockGps: () => void;
 }
 
 export default function useLocation(enabled: boolean): UseLocationReturn {
@@ -106,8 +107,15 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
     try {
       setGpsStatus('GPS_SEARCHING');
       const current = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Location.Accuracy.High,
       });
+
+      if (current.mocked) {
+        setGpsStatus('GPS_MOCKED');
+        setLocationData(null);
+        return;
+      }
+
       const address = await reverseGeocode(
         current.coords.latitude,
         current.coords.longitude
@@ -130,6 +138,10 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
       return;
     }
 
+    // 이전 위치 캐싱(좌표 비교용)
+    let lastLatitude: number | null = null;
+    let lastLongitude: number | null = null;
+    let lastAddress: string | null = null;
     let subscription: Location.LocationSubscription | null = null;
 
     const startWatching = async () => {
@@ -138,18 +150,77 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
 
       setGpsStatus('GPS_SEARCHING');
 
+      // 1. 초기 1회 고속 위치 획득 (Low 수준으로 기지국/Wi-Fi 정보를 신속하게 조회하고 2초 타임아웃 제한)
+      try {
+        const getFastPosition = Promise.race([
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Location fetch timeout')), 2000)
+          ),
+        ]);
+
+        const current = await getFastPosition;
+
+        if (current.mocked) {
+          setGpsStatus('GPS_MOCKED');
+          setLocationData(null);
+          return;
+        }
+
+        const address = await reverseGeocode(
+          current.coords.latitude,
+          current.coords.longitude
+        );
+
+        lastLatitude = current.coords.latitude;
+        lastLongitude = current.coords.longitude;
+        lastAddress = address;
+
+        setLocationData({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+          address,
+        });
+        setGpsStatus('GPS_OK');
+      } catch {
+        // 2초 내에 즉시 위치 획득이 안 되거나 에러가 나면 watchPositionAsync 단계에서 가져오도록 유도합니다.
+      }
+
+      // 2. 실시간 위치 변화 모니터링 시작
       try {
         subscription = await Location.watchPositionAsync(
           {
-            accuracy: Location.Accuracy.Balanced,
+            accuracy: Location.Accuracy.High,
             timeInterval: LOCATION_UPDATE_INTERVAL_MS,
             distanceInterval: LOCATION_DISTANCE_FILTER_M,
           },
           async (loc) => {
-            const address = await reverseGeocode(
-              loc.coords.latitude,
-              loc.coords.longitude
-            );
+            if (loc.mocked) {
+              setGpsStatus('GPS_MOCKED');
+              setLocationData(null);
+              return;
+            }
+
+            // 위도/경도 오차가 0.00001 (약 1m 이내) 이하이고 주소가 존재하면 API 호출 생략
+            let address = lastAddress;
+            const hasMoved =
+              lastLatitude === null ||
+              lastLongitude === null ||
+              Math.abs(loc.coords.latitude - lastLatitude) > 0.00001 ||
+              Math.abs(loc.coords.longitude - lastLongitude) > 0.00001;
+
+            if (hasMoved || !lastAddress) {
+              address = await reverseGeocode(
+                loc.coords.latitude,
+                loc.coords.longitude
+              );
+              lastLatitude = loc.coords.latitude;
+              lastLongitude = loc.coords.longitude;
+              lastAddress = address;
+            }
+
             setLocationData({
               latitude: loc.coords.latitude,
               longitude: loc.coords.longitude,
@@ -175,5 +246,10 @@ export default function useLocation(enabled: boolean): UseLocationReturn {
     location: locationData,
   };
 
-  return { gpsInfo, requestPermission, refreshLocation };
+  const testMockGps = useCallback(() => {
+    setGpsStatus('GPS_MOCKED');
+    setLocationData(null);
+  }, []);
+
+  return { gpsInfo, requestPermission, refreshLocation, testMockGps };
 }

@@ -5,24 +5,25 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Settings } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { COLORS, WATERMARK_TEXT } from '@/constants';
+import { CameraPreview, CaptureButton, GpsStatusBar } from '@/components/camera';
 import useCamera from '@/hooks/use-camera';
 import useLocation from '@/hooks/use-location';
 import useSettings from '@/hooks/use-settings';
-import { CameraPreview, CaptureButton } from '@/components/camera';
 import { formatTimestamp } from '@/utils/format-date';
 
 import type { CaptureData } from '@/types';
 
+import { COLORS, WATERMARK_TEXT } from '@/constants';
+
 export default function CameraScreen() {
   const router = useRouter();
   const [now, setNow] = useState(new Date());
-  const { settings, updateField, loadSettings } = useSettings();
+  const { settings, loadSettings } = useSettings();
 
   useFocusEffect(
     useCallback(() => {
@@ -31,7 +32,7 @@ export default function CameraScreen() {
   );
   const { cameraRef, hasPermission, isCapturing, requestPermission, takePicture } =
     useCamera();
-  const { gpsInfo } = useLocation(settings.locationEnabled);
+  const { gpsInfo, testMockGps } = useLocation(settings.locationEnabled);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -99,8 +100,23 @@ export default function CameraScreen() {
 
       {/* Bottom Controls */}
       <SafeAreaView edges={['bottom']} style={styles.bottomControls}>
+        {/* GPS 상태바를 하단 컨트롤들과 겹치지 않게 촬영 버튼의 상단 영역에 독립 배치 */}
+        {settings.locationEnabled && (
+          <View style={styles.gpsStatusContainer}>
+            {__DEV__ && (
+              <Pressable
+                onPress={testMockGps}
+                style={styles.mockTestButton}
+              >
+                <Text style={styles.mockTestButtonText}>MOCK 테스트</Text>
+              </Pressable>
+            )}
+            <GpsStatusBar gpsInfo={gpsInfo} locationEnabled={settings.locationEnabled} />
+          </View>
+        )}
+
         <View style={styles.controlsRow}>
-          {/* Location Toggle Space for layout balance */}
+          {/* Layout balance spacer */}
           <View style={styles.sideControlWrapper} />
 
           {/* Capture Button */}
@@ -206,6 +222,24 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     paddingTop: 24,
     zIndex: 10,
+  },
+  gpsStatusContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  mockTestButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,50,50,0.8)',
+    borderRadius: 4,
+  },
+  mockTestButtonText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   controlsRow: {
     flexDirection: 'row',

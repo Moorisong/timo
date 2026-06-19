@@ -63,4 +63,34 @@ describe('useCamera Hook 테스트', () => {
       height: 1080,
     });
   });
+
+  it('EXIF Orientation이 6(90도 회전)인 경우 width와 height가 서로 바뀌어 반환되어야 한다', async () => {
+    const mockPhoto = {
+      uri: 'file://test-image-rotated.jpg',
+      width: 4000,
+      height: 3000,
+      exif: {
+        Orientation: 6,
+      },
+    };
+    mockTakePictureAsync.mockResolvedValueOnce(mockPhoto);
+
+    const { result } = renderHook(() => useCamera());
+
+    const dummyRef = {
+      takePictureAsync: mockTakePictureAsync,
+    };
+    result.current.cameraRef.current = dummyRef as any;
+
+    let photoResult;
+    await act(async () => {
+      photoResult = await result.current.takePicture();
+    });
+
+    expect(photoResult).toEqual({
+      uri: 'file://test-image-rotated.jpg',
+      width: 3000,
+      height: 4000,
+    });
+  });
 });

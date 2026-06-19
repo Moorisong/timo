@@ -34,7 +34,9 @@ export default function PreviewScreen() {
   const params = useLocalSearchParams<{ captureData?: string }>();
   const viewShotRef = useRef<ViewShot>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
   const [isSharing, setIsSharing] = useState(false);
+  const isSharingRef = useRef(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -71,7 +73,8 @@ export default function PreviewScreen() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (isSaving) return;
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
     setIsSaving(true);
     try {
       const composedUri = await captureComposedImage();
@@ -91,12 +94,14 @@ export default function PreviewScreen() {
     } catch {
       showToast('저장 중 오류가 발생했습니다.');
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
     }
-  }, [isSaving, captureComposedImage, router, showToast]);
+  }, [captureComposedImage, router, showToast]);
 
   const handleShare = useCallback(async () => {
-    if (isSharing) return;
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
     setIsSharing(true);
     try {
       const composedUri = await captureComposedImage();
@@ -113,24 +118,24 @@ export default function PreviewScreen() {
     } catch {
       showToast('공유 중 오류가 발생했습니다.');
     } finally {
+      isSharingRef.current = false;
       setIsSharing(false);
     }
-  }, [isSharing, captureComposedImage, showToast]);
+  }, [captureComposedImage, showToast]);
 
   const isLandscape = captureData ? captureData.width > captureData.height : false;
+  const imageAspectRatio = captureData && captureData.height > 0
+    ? captureData.width / captureData.height
+    : (isLandscape ? 4 / 3 : 3 / 4);
   
   // 1. 화면에 보일 레이아웃 크기 설정 (화면 너비 기준)
   const composerWidth = SCREEN_WIDTH;
-  const composerHeight = isLandscape
-    ? composerWidth * (3 / 4)
-    : composerWidth * (4 / 3);
+  const composerHeight = composerWidth / imageAspectRatio;
 
   // 2. 저장용 고해상도 캡처 규격 설정 (1920px 수준의 초고화질)
   const TARGET_CAPTURE_WIDTH = 1920;
   const captureWidth = TARGET_CAPTURE_WIDTH;
-  const captureHeight = isLandscape
-    ? captureWidth * (3 / 4)
-    : captureWidth * (4 / 3);
+  const captureHeight = captureWidth / imageAspectRatio;
 
   // 화면에는 1:1 원래 배율로 렌더링됩니다.
   const scale = 1;

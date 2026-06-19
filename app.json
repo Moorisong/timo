@@ -7,21 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "timo",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon",
-      "infoPlist": {
-        "NSCameraUsageDescription": "현장 사진 촬영을 위해 카메라 접근이 필요합니다.",
-        "NSLocationWhenInUseUsageDescription": "촬영 사진에 위치 정보를 기록하기 위해 위치 접근이 필요합니다.",
-        "NSPhotoLibraryAddUsageDescription": "촬영된 사진을 갤러리에 저장하기 위해 사진 접근이 필요합니다."
-      }
-    },
+
     "android": {
       "package": "com.timo.android",
+      "versionCode": 13,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#208AEF",
+        "foregroundImage": "./assets/images/android-icon-foreground-white.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -82,6 +74,21 @@
           "photosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 접근이 필요합니다.",
           "savePhotosPermission": "촬영된 사진을 갤러리에 저장하기 위해 사진 저장 권한이 필요합니다.",
           "saveAudioPermission": "촬영된 사진을 갤러리에 저장하기 위해 오디오 권한이 필요합니다."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraParams": {
+              "org.gradle.jvmargs": "-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+UseG1GC",
+              "org.gradle.caching": "true",
+              "org.gradle.parallel": "true",
+              "org.gradle.configureondemand": "true",
+              "org.gradle.daemon": "true",
+              "org.gradle.vfs.watch": "true"
+            }
+          }
         }
       ]
     ],

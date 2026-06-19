@@ -2,7 +2,7 @@
  * Settings Screen 스타일
  */
 
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { COLORS } from '@/constants';
 
@@ -154,7 +154,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 8,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   previewAgency: {
     color: 'rgba(255,255,255,0.95)',
@@ -183,7 +183,7 @@ export const styles = StyleSheet.create({
     right: 8,
   },
   timeBadge: {
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 6,
@@ -232,17 +232,7 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     borderRadius: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    elevation: 6,
   },
   saveButtonText: {
     color: '#FFF',
