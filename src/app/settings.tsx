@@ -25,6 +25,7 @@ import {
 } from '@/constants';
 import useSettings from '@/hooks/use-settings';
 import { SettingsPreview } from '@/components/settings-preview';
+import { getUnicodeLength, sliceUnicode } from '@/utils/unicode';
 
 import { styles } from './settings.styles';
 
@@ -90,7 +91,7 @@ export default function SettingsScreen() {
                 <Text style={styles.labelText}>기관명</Text>
               </View>
               <Text style={styles.charCount}>
-                {settings.agencyName.length}/{MAX_AGENCY_NAME_LENGTH}
+                {getUnicodeLength(settings.agencyName)}/{MAX_AGENCY_NAME_LENGTH}
               </Text>
             </View>
             <View style={styles.inputWrapper}>
@@ -100,7 +101,7 @@ export default function SettingsScreen() {
                 onChangeText={(t) =>
                   updateField(
                     'agencyName',
-                    t.slice(0, MAX_AGENCY_NAME_LENGTH)
+                    sliceUnicode(t, MAX_AGENCY_NAME_LENGTH)
                   )
                 }
                 onFocus={() => setFocusedField('agencyName')}
@@ -142,7 +143,7 @@ export default function SettingsScreen() {
                 <Text style={styles.labelText}>담당자명</Text>
               </View>
               <Text style={styles.charCount}>
-                {settings.inspectorName.length}/{MAX_INSPECTOR_NAME_LENGTH}
+                {getUnicodeLength(settings.inspectorName)}/{MAX_INSPECTOR_NAME_LENGTH}
               </Text>
             </View>
             <View style={styles.inputWrapper}>
@@ -152,7 +153,7 @@ export default function SettingsScreen() {
                 onChangeText={(t) =>
                   updateField(
                     'inspectorName',
-                    t.slice(0, MAX_INSPECTOR_NAME_LENGTH)
+                    sliceUnicode(t, MAX_INSPECTOR_NAME_LENGTH)
                   )
                 }
                 onFocus={() => setFocusedField('inspectorName')}
@@ -194,7 +195,7 @@ export default function SettingsScreen() {
                 <Text style={styles.labelText}>메모</Text>
               </View>
               <Text style={styles.charCount}>
-                {settings.comment.length}/{MAX_COMMENT_LENGTH}
+                {getUnicodeLength(settings.comment)}/{MAX_COMMENT_LENGTH}
               </Text>
             </View>
             <View style={styles.inputWrapper}>
@@ -202,7 +203,7 @@ export default function SettingsScreen() {
                 style={styles.input}
                 value={settings.comment}
                 onChangeText={(t) =>
-                  updateField('comment', t.slice(0, MAX_COMMENT_LENGTH))
+                  updateField('comment', sliceUnicode(t, MAX_COMMENT_LENGTH))
                 }
                 onFocus={() => setFocusedField('comment')}
                 onBlur={() => setFocusedField(null)}
