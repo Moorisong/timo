@@ -81,7 +81,10 @@ describe('media-saver 서비스 테스트', () => {
     });
 
     it('시나리오: 권한 요청이 거부되고 다시 묻지 않기가 활성화된 경우(canAskAgain: false) Alert 팝업을 띄우고 false를 반환해야 한다', async () => {
-      const { Alert, Linking } = require('react-native');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const Alert = require('react-native').Alert;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const Linking = require('react-native').Linking;
       jest.spyOn(Alert, 'alert');
       jest.spyOn(Linking, 'openSettings');
 
@@ -114,7 +117,8 @@ describe('media-saver 서비스 테스트', () => {
     });
 
     it('시나리오: 권한 요청이 단순 거부된 경우(canAskAgain: true) Alert를 띄우지 않고 false를 반환해야 한다', async () => {
-      const { Alert } = require('react-native');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const Alert = require('react-native').Alert;
       jest.spyOn(Alert, 'alert');
 
       (MediaLibrary.getPermissionsAsync as jest.Mock).mockResolvedValue({
@@ -167,7 +171,9 @@ describe('media-saver 서비스 테스트', () => {
     });
 
     it('코드 내에 iOS 관련 분기 처리(Platform.OS === "ios" 등)가 포함되지 않아야 한다 (Android 전용 앱 보장)', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const path = require('path');
       const sourceCode = fs.readFileSync(path.resolve(__dirname, '../media-saver.ts'), 'utf-8');
       expect(sourceCode.toLowerCase()).not.toContain('ios');
