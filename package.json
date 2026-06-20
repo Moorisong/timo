@@ -66,7 +66,8 @@
     "build:android-local": "eas build --platform android --profile production --local",
     "build:android-preview-local": "eas build --platform android --profile preview --local",
     "build:android-dev-local": "eas build --platform android --profile local-dev --local",
-    "build:clean-android": "npx expo prebuild --platform android --clean"
+    "build:clean-android": "npx expo prebuild --platform android --clean",
+    "ios": "expo run:ios"
   },
   "private": true
 }
