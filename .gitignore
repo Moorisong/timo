@@ -51,3 +51,5 @@ credentials.json
 
 # AI agent working rules
 AGENTS.md
+docs/
+.antigravity/
